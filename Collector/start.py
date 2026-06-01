@@ -1,70 +1,129 @@
-# =============================================================
-#  NSE Breakout Scanner  —  start.py
-#  Uses Yahoo Finance (yfinance) — no auth, no blocking
-# =============================================================
+"""
+NSE Breakout Scanner
 
+1. Load Nifty 500 symbols from NSE
+2. Download daily OHLCV (Yahoo Finance) → DuckDB
+3. Apply technical filters and save passing symbols to DuckDB
+
+Tune fetch length and filters in config.py
+"""
+
+from __future__ import annotations
+
+import logging
 import os
-import json
-import time
 import random
-import requests
-import pandas as pd
-import pandas_ta as ta
-from io import BytesIO
-from datetime import date, timedelta
+import sys
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import date, timedelta
+from io import BytesIO
+
+import numpy as np
+import pandas as pd
+import requests
 import yfinance as yf
 
-# -------------------------------------------------------------
-# CONFIG
-# -------------------------------------------------------------
-TARGET_DIR    = "targets"
-OUTPUT_FILE   = os.path.join(TARGET_DIR, "filtered_stocks.json")
-WORKERS       = 5          # Yahoo is more tolerant than NSE
-SLEEP_MIN     = 0.2
-SLEEP_MAX     = 0.5
-LOOKBACK_DAYS = 400
-MIN_BARS      = 220
-MIN_PRICE     = 20
-MIN_VOLUME    = 100_000
-MAX_ATR_PCT   = 0.06
-MIN_SCORE     = 65
+_COLLECTOR_DIR = os.path.dirname(os.path.abspath(__file__))
+if _COLLECTOR_DIR not in sys.path:
+    sys.path.insert(0, _COLLECTOR_DIR)
 
-os.makedirs(TARGET_DIR, exist_ok=True)
+import config as cfg
+import db as store
 
-# -------------------------------------------------------------
-# STEP 1 — Get Nifty 500 symbols
-# -------------------------------------------------------------
+logging.getLogger("yfinance").setLevel(logging.CRITICAL)
+
+REQUIRED_COLS = (
+    "close",
+    "volume",
+    "EMA20",
+    "EMA50",
+    "EMA200",
+    "RSI",
+    "MACD",
+    "MACD_SIGNAL",
+    "ADX",
+    "ATR",
+)
+
 HEADERS = {
     "User-Agent": (
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/124.0.0.0 Safari/537.36"
     ),
-    "Referer": "https://www.nseindia.com",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+    "Referer": "https://www.nseindia.com/",
 }
 
-def get_nifty500_symbols():
-    url  = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
-    resp = requests.get(url, headers=HEADERS, timeout=15)
+
+def print_settings() -> None:
+    print("=" * 50)
+    print("SETTINGS (edit Collector/config.py to change)")
+    print("=" * 50)
+    print(f"  Years of history     : {cfg.YEARS_OF_HISTORY}")
+    print(f"  Calendar buffer days : {cfg.CALENDAR_BUFFER_DAYS}")
+    print(f"  Lookback days (total): {cfg.LOOKBACK_DAYS}")
+    print(f"  Min bars per symbol  : {cfg.MIN_BARS}")
+    print(f"  Force refresh        : {cfg.FORCE_REFRESH_ON_RUN}")
+    print(f"  Download workers     : {cfg.WORKERS}")
+    print(f"  Min price (INR)      : {cfg.MIN_PRICE}")
+    print(f"  Min volume           : {cfg.MIN_VOLUME:,}")
+    print(f"  Max ATR % of price   : {cfg.MAX_ATR_PCT * 100:.1f}%")
+    print(f"  Min pass score       : {cfg.MIN_SCORE}")
+    print(f"  Database             : {cfg.DB_PATH}")
+    print("=" * 50)
+    print()
+
+
+def ensure_dirs() -> None:
+    os.makedirs(os.path.dirname(cfg.DB_PATH), exist_ok=True)
+
+
+def get_nifty500_symbols() -> list[str]:
+    session = requests.Session()
+    session.headers.update(HEADERS)
+    session.get("https://www.nseindia.com", timeout=20)
+
+    url = "https://nsearchives.nseindia.com/content/indices/ind_nifty500list.csv"
+    resp = session.get(url, timeout=30)
     resp.raise_for_status()
-    df   = pd.read_csv(BytesIO(resp.content))
-    col  = next(c for c in df.columns if c.strip().lower() == "symbol")
-    return df[col].str.strip().tolist()
 
-print("Fetching Nifty 500 symbols...")
-symbols = get_nifty500_symbols()
-print(f"Got {len(symbols)} symbols\n")
+    df = pd.read_csv(BytesIO(resp.content))
+    col = next(c for c in df.columns if c.strip().lower() == "symbol")
+    symbols = df[col].astype(str).str.strip()
+    return symbols[
+        symbols.ne("")
+        & symbols.ne("nan")
+        & ~symbols.str.upper().str.startswith("DUMMY")
+    ].tolist()
 
-# Yahoo Finance needs ".NS" suffix for NSE stocks
-yf_symbols = [s + ".NS" for s in symbols]
 
-# -------------------------------------------------------------
-# STEP 2 — Fetch history via yfinance
-# -------------------------------------------------------------
-def fetch_history(yf_symbol: str) -> pd.DataFrame | None:
-    end   = date.today()
-    start = end - timedelta(days=LOOKBACK_DAYS)
+def _normalize_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
+    if isinstance(df.columns, pd.MultiIndex):
+        df.columns = df.columns.get_level_values(0)
+
+    rename = {
+        "Open": "open",
+        "High": "high",
+        "Low": "low",
+        "Close": "close",
+        "Volume": "volume",
+    }
+    df = df.rename(columns={k: v for k, v in rename.items() if k in df.columns})
+    df = df[["open", "high", "low", "close", "volume"]].copy()
+
+    for col in df.columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+
+    df.dropna(inplace=True)
+    return df.sort_index()
+
+
+def fetch_history_from_yahoo(yf_symbol: str) -> pd.DataFrame | None:
+    end = date.today()
+    start = end - timedelta(days=cfg.LOOKBACK_DAYS)
 
     df = yf.download(
         yf_symbol,
@@ -73,181 +132,271 @@ def fetch_history(yf_symbol: str) -> pd.DataFrame | None:
         interval="1d",
         progress=False,
         auto_adjust=True,
+        threads=False,
     )
 
     if df is None or df.empty:
         return None
 
-    # Flatten MultiIndex columns if present
-    if isinstance(df.columns, pd.MultiIndex):
-        df.columns = df.columns.get_level_values(0)
+    df = _normalize_ohlcv(df)
+    return df if len(df) >= cfg.MIN_BARS else None
 
-    df = df.rename(columns={
-        "Open":   "open",
-        "High":   "high",
-        "Low":    "low",
-        "Close":  "close",
-        "Volume": "volume",
-    })
 
-    df = df[["open", "high", "low", "close", "volume"]].copy()
+def save_history(symbol: str, df: pd.DataFrame) -> None:
+    store.save_ohlcv(cfg.DB_PATH, symbol, df)
 
-    for col in df.columns:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    df.dropna(inplace=True)
-    df = df.sort_index()
+def load_history(symbol: str) -> pd.DataFrame | None:
+    df = store.load_ohlcv(cfg.DB_PATH, symbol, cfg.MIN_BARS)
+    return _normalize_ohlcv(df) if df is not None else None
 
+
+def get_history(symbol: str, yf_symbol: str, force_refresh: bool = False) -> pd.DataFrame | None:
+    if not force_refresh:
+        cached = load_history(symbol)
+        if cached is not None:
+            return cached
+
+    df = fetch_history_from_yahoo(yf_symbol)
+    if df is not None:
+        save_history(symbol, df)
     return df
 
-# -------------------------------------------------------------
-# STEP 3 — Per-symbol scan
-# -------------------------------------------------------------
-def process_symbol(args):
-    symbol, yf_symbol = args
-    time.sleep(random.uniform(SLEEP_MIN, SLEEP_MAX))
 
-    try:
-        df = fetch_history(yf_symbol)
+def _ema(series: pd.Series, length: int) -> pd.Series:
+    return series.ewm(span=length, adjust=False).mean()
 
-        if df is None or len(df) < MIN_BARS:
-            return None
 
-        # --------------------------------------------------
-        # INDICATORS
-        # --------------------------------------------------
-        df["EMA20"]  = ta.ema(df["close"], length=20)
-        df["EMA50"]  = ta.ema(df["close"], length=50)
-        df["EMA200"] = ta.ema(df["close"], length=200)
-        df["RSI"]    = ta.rsi(df["close"], length=14)
+def _rsi(close: pd.Series, length: int = 14) -> pd.Series:
+    delta = close.diff()
+    gain = delta.clip(lower=0.0)
+    loss = (-delta).clip(lower=0.0)
+    avg_gain = gain.ewm(alpha=1 / length, min_periods=length, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1 / length, min_periods=length, adjust=False).mean()
+    rs = avg_gain / avg_loss.replace(0, np.nan)
+    return 100 - (100 / (1 + rs))
 
-        macd_df           = ta.macd(df["close"])
-        df["MACD"]        = macd_df.iloc[:, 0]
-        df["MACD_SIGNAL"] = macd_df.iloc[:, 1]
 
-        adx_df   = ta.adx(high=df["high"], low=df["low"], close=df["close"])
-        df["ADX"] = adx_df["ADX_14"]
-        df["ATR"] = ta.atr(high=df["high"], low=df["low"], close=df["close"])
+def _macd(close: pd.Series) -> tuple[pd.Series, pd.Series]:
+    macd_line = _ema(close, 12) - _ema(close, 26)
+    signal = macd_line.ewm(span=9, adjust=False).mean()
+    return macd_line, signal
 
-        latest = df.iloc[-1]
 
-        # --------------------------------------------------
-        # PHASE 1 — Basic filters
-        # --------------------------------------------------
-        if latest["close"] < MIN_PRICE:
-            return None
+def _atr(high: pd.Series, low: pd.Series, close: pd.Series, length: int = 14) -> pd.Series:
+    prev_close = close.shift(1)
+    tr = pd.concat(
+        [high - low, (high - prev_close).abs(), (low - prev_close).abs()],
+        axis=1,
+    ).max(axis=1)
+    return tr.ewm(alpha=1 / length, min_periods=length, adjust=False).mean()
 
-        if latest["volume"] < MIN_VOLUME:
-            return None
 
-        atr_pct = latest["ATR"] / latest["close"]
-        if atr_pct > MAX_ATR_PCT:
-            return None
+def _adx(high: pd.Series, low: pd.Series, close: pd.Series, length: int = 14) -> pd.Series:
+    up = high.diff()
+    down = -low.diff()
+    plus_dm = np.where((up > down) & (up > 0), up, 0.0)
+    minus_dm = np.where((down > up) & (down > 0), down, 0.0)
 
-        # --------------------------------------------------
-        # PHASE 2 — Trend & breakout
-        # --------------------------------------------------
-        trend_ok = (
-            latest["close"]
-            > latest["EMA20"]
-            > latest["EMA50"]
-            > latest["EMA200"]
-        )
-        if not trend_ok:
-            return None
+    atr = _atr(high, low, close, length)
+    plus_di = 100 * pd.Series(plus_dm, index=high.index).ewm(
+        alpha=1 / length, min_periods=length, adjust=False
+    ).mean() / atr
+    minus_di = 100 * pd.Series(minus_dm, index=high.index).ewm(
+        alpha=1 / length, min_periods=length, adjust=False
+    ).mean() / atr
 
-        high20 = df["high"].iloc[-21:-1].max()
-        if latest["close"] <= high20:
-            return None
+    dx = (plus_di - minus_di).abs() / (plus_di + minus_di).replace(0, np.nan) * 100
+    return dx.ewm(alpha=1 / length, min_periods=length, adjust=False).mean()
 
-        avg_vol20    = df["volume"].tail(20).mean()
-        volume_ratio = latest["volume"] / avg_vol20
-        if volume_ratio <= 2:
-            return None
 
-        rsi = latest["RSI"]
-        if not (55 <= rsi <= 75):
-            return None
+def add_indicators(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    df["EMA20"] = _ema(df["close"], 20)
+    df["EMA50"] = _ema(df["close"], 50)
+    df["EMA200"] = _ema(df["close"], 200)
+    df["RSI"] = _rsi(df["close"], 14)
 
-        if latest["MACD"] <= latest["MACD_SIGNAL"]:
-            return None
+    macd_line, signal = _macd(df["close"])
+    df["MACD"] = macd_line
+    df["MACD_SIGNAL"] = signal
+    df["ADX"] = _adx(df["high"], df["low"], df["close"], 14)
+    df["ATR"] = _atr(df["high"], df["low"], df["close"], 14)
+    return df
 
-        if latest["ADX"] <= 20:
-            return None
 
-        # --------------------------------------------------
-        # SCORE
-        # --------------------------------------------------
-        score  = 0
-        score += min(volume_ratio * 10, 25)
-        score += min(latest["ADX"], 25)
-        score += max(0, rsi - 50)
-        score += 10
+def latest_row_valid(latest: pd.Series) -> bool:
+    for col in REQUIRED_COLS:
+        val = latest.get(col)
+        if val is None or pd.isna(val):
+            return False
+    return True
 
-        if score < MIN_SCORE:
-            return None
 
-        return {
-            "symbol":       symbol,
-            "score":        round(score, 2),
-            "close":        round(float(latest["close"]), 2),
-            "volume_ratio": round(float(volume_ratio), 2),
-            "rsi":          round(float(rsi), 2),
-            "adx":          round(float(latest["ADX"]), 2),
-            "atr_pct":      round(float(atr_pct * 100), 2),
-        }
+def scan_symbol(df: pd.DataFrame, symbol: str) -> dict | None:
+    df = add_indicators(df)
+    latest = df.iloc[-1]
 
-    except Exception as e:
-        print(f"  ERROR {symbol}: {e}")
+    if not latest_row_valid(latest):
+        return None
+    if latest["close"] < cfg.MIN_PRICE:
+        return None
+    if latest["volume"] < cfg.MIN_VOLUME:
         return None
 
-# -------------------------------------------------------------
-# STEP 4 — Run scan
-# -------------------------------------------------------------
-passed_stocks = []
-total = len(symbols)
-done  = 0
+    atr_pct = float(latest["ATR"]) / float(latest["close"])
+    if atr_pct > cfg.MAX_ATR_PCT:
+        return None
 
-print(f"Scanning {total} symbols with {WORKERS} workers...\n")
+    if not (
+        latest["close"] > latest["EMA20"] > latest["EMA50"] > latest["EMA200"]
+    ):
+        return None
 
-pairs = list(zip(symbols, yf_symbols))
+    high20 = df["high"].iloc[-21:-1].max()
+    if latest["close"] <= high20:
+        return None
 
-with ThreadPoolExecutor(max_workers=WORKERS) as executor:
-    futures = {executor.submit(process_symbol, p): p[0] for p in pairs}
+    avg_vol20 = df["volume"].tail(20).mean()
+    if avg_vol20 <= 0:
+        return None
 
-    for future in as_completed(futures):
-        done += 1
-        result = future.result()
+    volume_ratio = float(latest["volume"]) / float(avg_vol20)
+    if volume_ratio <= 2:
+        return None
 
-        if result:
-            passed_stocks.append(result)
-            print(
-                f"  PASS [{done}/{total}] {result['symbol']:15s} "
-                f"Score={result['score']:.1f}  RSI={result['rsi']}  "
-                f"ADX={result['adx']}  VolRatio={result['volume_ratio']}x"
-            )
-        elif done % 50 == 0:
-            print(f"  ... [{done}/{total}] scanned")
+    rsi = float(latest["RSI"])
+    if not (55 <= rsi <= 75):
+        return None
+    if latest["MACD"] <= latest["MACD_SIGNAL"]:
+        return None
+    if latest["ADX"] <= 20:
+        return None
 
-# -------------------------------------------------------------
-# STEP 5 — Sort & save
-# -------------------------------------------------------------
-passed_stocks.sort(key=lambda x: x["score"], reverse=True)
+    score = min(volume_ratio * 10, 25) + min(float(latest["ADX"]), 25)
+    score += max(0.0, rsi - 50) + 10
+    if score < cfg.MIN_SCORE:
+        return None
 
-with open(OUTPUT_FILE, "w") as f:
-    json.dump(passed_stocks, f, indent=4)
+    first_date = df.index.min()
+    last_date = df.index.max()
 
-print(f"\n{'='*50}")
-print(f"Scan complete. {len(passed_stocks)} stocks passed.")
-print(f"Results saved to: {OUTPUT_FILE}")
-print(f"{'='*50}\n")
+    return {
+        "symbol": symbol,
+        "score": round(score, 2),
+        "close": round(float(latest["close"]), 2),
+        "volume_ratio": round(volume_ratio, 2),
+        "rsi": round(rsi, 2),
+        "adx": round(float(latest["ADX"]), 2),
+        "atr_pct": round(atr_pct * 100, 2),
+        "bars": len(df),
+        "history_from": str(first_date.date()),
+        "history_to": str(last_date.date()),
+    }
 
-if passed_stocks:
-    print(f"{'SYMBOL':<15} {'SCORE':>6} {'CLOSE':>8} {'RSI':>6} {'ADX':>6} {'VOL_RATIO':>10}")
-    print("-" * 55)
+
+def process_symbol(
+    args: tuple[str, str], force_refresh: bool = False
+) -> tuple[dict | None, dict]:
+    symbol, yf_symbol = args
+    time.sleep(random.uniform(cfg.SLEEP_MIN, cfg.SLEEP_MAX))
+
+    meta = {"symbol": symbol, "downloaded": False, "bars": 0, "error": None}
+
+    try:
+        df = get_history(symbol, yf_symbol, force_refresh=force_refresh)
+        if df is None:
+            meta["error"] = "insufficient_history"
+            return None, meta
+
+        meta["downloaded"] = True
+        meta["bars"] = len(df)
+        meta["from"] = str(df.index.min().date())
+        meta["to"] = str(df.index.max().date())
+
+        return scan_symbol(df, symbol), meta
+
+    except Exception as exc:
+        meta["error"] = str(exc)
+        print(f"  ERROR {symbol}: {exc}")
+        return None, meta
+
+
+def print_results(passed_stocks: list[dict], run_id: int) -> None:
+    print(f"\n{'=' * 50}")
+    print(f"Done — {len(passed_stocks)} stocks passed (run_id={run_id})")
+    print(f"DuckDB: {cfg.DB_PATH}")
+    print(f"  Tables: ohlcv_daily, symbol_meta, scan_runs, scan_passed")
+    print(f"{'=' * 50}\n")
+
+    if not passed_stocks:
+        return
+
+    print(
+        f"{'SYMBOL':<15} {'SCORE':>6} {'CLOSE':>8} {'RSI':>6} "
+        f"{'ADX':>6} {'VOL_RATIO':>10} {'BARS':>6}"
+    )
+    print("-" * 65)
     for s in passed_stocks:
         print(
-            f"{s['symbol']:<15} {s['score']:>6.1f} "
-            f"{s['close']:>8.2f} {s['rsi']:>6.1f} "
-            f"{s['adx']:>6.1f} {s['volume_ratio']:>9.1f}x"
+            f"{s['symbol']:<15} {s['score']:>6.1f} {s['close']:>8.2f} "
+            f"{s['rsi']:>6.1f} {s['adx']:>6.1f} {s['volume_ratio']:>9.1f}x "
+            f"{s['bars']:>6}"
         )
+
+
+def run(force_refresh: bool | None = None) -> None:
+    if force_refresh is None:
+        force_refresh = cfg.FORCE_REFRESH_ON_RUN
+
+    ensure_dirs()
+    print_settings()
+
+    print("Fetching Nifty 500 symbols...")
+    symbols = get_nifty500_symbols()
+    print(f"Got {len(symbols)} symbols\n")
+
+    pairs = list(zip(symbols, [s + ".NS" for s in symbols]))
+    passed_stocks: list[dict] = []
+    download_meta: list[dict] = []
+    total = len(pairs)
+    done = 0
+
+    with ThreadPoolExecutor(max_workers=cfg.WORKERS) as executor:
+        futures = {
+            executor.submit(process_symbol, p, force_refresh): p[0] for p in pairs
+        }
+
+        for future in as_completed(futures):
+            done += 1
+            result, meta = future.result()
+            download_meta.append(meta)
+
+            if result:
+                passed_stocks.append(result)
+                print(
+                    f"  PASS [{done}/{total}] {result['symbol']:15s} "
+                    f"Score={result['score']:.1f}  RSI={result['rsi']}  "
+                    f"ADX={result['adx']}  VolRatio={result['volume_ratio']}x"
+                )
+            elif done % 50 == 0:
+                print(f"  ... [{done}/{total}] processed")
+
+    passed_stocks.sort(key=lambda x: x["score"], reverse=True)
+    ok_downloads = sum(1 for m in download_meta if m.get("downloaded"))
+
+    summary = {
+        "run_date": date.today().isoformat(),
+        "years_requested": cfg.YEARS_OF_HISTORY,
+        "lookback_days": cfg.LOOKBACK_DAYS,
+        "symbols_total": total,
+        "symbols_with_history": ok_downloads,
+        "symbols_passed_scan": len(passed_stocks),
+        "database": cfg.DB_PATH,
+    }
+    run_id = store.save_scan_run(cfg.DB_PATH, summary, passed_stocks)
+    print_results(passed_stocks, run_id)
+
+
+if __name__ == "__main__":
+    run()
