@@ -10,9 +10,11 @@ Tune fetch length and filters in config.py
 
 from __future__ import annotations
 
+import argparse
 import logging
 import os
 import random
+import shutil
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -79,6 +81,20 @@ def print_settings() -> None:
 
 def ensure_dirs() -> None:
     os.makedirs(os.path.dirname(cfg.DB_PATH), exist_ok=True)
+
+
+def clear_generated_data() -> None:
+    """Remove DuckDB and any leftover local artifacts (not used by current code)."""
+    for path in (
+        cfg.DB_PATH,
+        cfg.DB_PATH + ".wal",
+        os.path.join(cfg.BASE_DIR, "data", "history"),
+        os.path.join(cfg.BASE_DIR, "targets"),
+    ):
+        if os.path.isdir(path):
+            shutil.rmtree(path, ignore_errors=True)
+        elif os.path.isfile(path):
+            os.remove(path)
 
 
 def get_nifty500_symbols() -> list[str]:
@@ -326,7 +342,8 @@ def print_results(passed_stocks: list[dict], run_id: int) -> None:
     print(f"\n{'=' * 50}")
     print(f"Done — {len(passed_stocks)} stocks passed (run_id={run_id})")
     print(f"DuckDB: {cfg.DB_PATH}")
-    print(f"  Tables: ohlcv_daily, symbol_meta, scan_runs, scan_passed")
+    print("  Tables: ohlcv_daily, symbol_meta, scan_runs, scan_passed")
+    print("  Latest picks: SELECT * FROM scan_passed WHERE run_id =", run_id)
     print(f"{'=' * 50}\n")
 
     if not passed_stocks:
@@ -399,4 +416,21 @@ def run(force_refresh: bool | None = None) -> None:
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser(description="NSE breakout scanner → DuckDB")
+    parser.add_argument(
+        "--fresh",
+        action="store_true",
+        help="Delete DuckDB and local artifacts, then download and scan from scratch",
+    )
+    parser.add_argument(
+        "--refresh",
+        action="store_true",
+        help="Re-download all symbols from Yahoo (ignore DuckDB cache)",
+    )
+    args = parser.parse_args()
+
+    if args.fresh:
+        clear_generated_data()
+        print("Cleared local data. Starting fresh download.\n")
+
+    run(force_refresh=args.refresh or args.fresh)

@@ -1,5 +1,7 @@
+# Generated at runtime (DuckDB + any local artifacts)
 data/
 targets/
+data/history/
 *.duckdb
 *.duckdb.wal
 __pycache__/
