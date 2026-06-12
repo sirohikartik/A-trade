@@ -1,10 +1,16 @@
 certifi>=2024.0.0
 charset-normalizer>=3.0.0
+duckdb>=1.0.0
 idna>=3.0
 numpy>=2.0.0
+openpyxl>=3.1.0
 pandas>=2.0.0
+pandas_market_calendars>=4.3.0
+pyarrow>=14.0.0
 python-dateutil>=2.8.0
+pyyaml>=6.0
 requests>=2.31.0
+ta>=0.11.0
+tqdm>=4.66.0
 urllib3>=2.0.0
 yfinance>=0.2.40
-duckdb>=1.0.0

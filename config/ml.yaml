@@ -1,0 +1,63 @@
+feature_columns:
+  raw:
+    - rsi
+    - adx
+    - atr_pct
+    - volume_ratio
+    - ema20_slope
+    - bb_width
+    - delivery_pct
+    - market_breadth
+    - pullback_ema20
+    - close_position
+    - macd_hist
+    - stoch_k
+  binary:
+    - ema_stack_bull
+    - above_ema20
+    - above_ema50
+    - above_ema200
+    - macd_bullish
+    - macd_hist_rising
+    - adx_strong
+    - adx_rising
+    - bb_squeeze
+    - bb_squeeze_breakout
+    - vol_trend_up
+    - near_20d_high
+    - near_52w_high
+    - new_20d_high
+    - new_52w_high
+    - above_prev_high
+    - rsi_bull_zone
+    - delivery_above_avg
+    - delivery_strong
+    - atr_risk_ok
+    - breakout_volume
+    - setup_ready
+    - candle_hammer
+    - candle_engulfing
+
+zscore_columns:
+  - rsi
+  - adx
+  - atr_pct
+  - volume_ratio
+  - ema20_slope
+  - bb_width
+  - delivery_pct
+
+lag_features:
+  - rsi
+  - volume_ratio
+  - macd_hist
+
+label_profiles_for_training:
+  - reference_swing
+  - segment_swing
+
+segments:
+  - large_cap
+  - mid_cap
+  - small_cap
+  - all

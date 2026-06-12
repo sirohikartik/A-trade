@@ -137,9 +137,11 @@ def _normalize_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
     return df.sort_index()
 
 
-def fetch_history_from_yahoo(yf_symbol: str) -> pd.DataFrame | None:
+def fetch_history_from_yahoo(yf_symbol: str, lookback_days: int | None = None) -> pd.DataFrame | None:
     end = date.today()
-    start = end - timedelta(days=cfg.LOOKBACK_DAYS)
+    days = lookback_days if lookback_days is not None else cfg.lookback_days()
+    start = end - timedelta(days=days)
+    min_bars = cfg.min_bars_required()
 
     df = yf.download(
         yf_symbol,
@@ -155,25 +157,43 @@ def fetch_history_from_yahoo(yf_symbol: str) -> pd.DataFrame | None:
         return None
 
     df = _normalize_ohlcv(df)
-    return df if len(df) >= cfg.MIN_BARS else None
+    return df if len(df) >= min_bars else None
 
 
 def save_history(symbol: str, df: pd.DataFrame) -> None:
     store.save_ohlcv(cfg.DB_PATH, symbol, df)
+    save_raw_ohlcv(symbol, df)
 
 
-def load_history(symbol: str) -> pd.DataFrame | None:
-    df = store.load_ohlcv(cfg.DB_PATH, symbol, cfg.MIN_BARS)
+def save_raw_ohlcv(symbol: str, df: pd.DataFrame) -> None:
+    """Plain OHLCV parquet alongside DuckDB (data/raw/ohlcv/)."""
+    os.makedirs(cfg.RAW_OHLCV_DIR, exist_ok=True)
+    out = df.reset_index()
+    out = out.rename(columns={out.columns[0]: "date"})
+    out["symbol"] = symbol
+    out["date"] = pd.to_datetime(out["date"]).dt.date
+    out.to_parquet(os.path.join(cfg.RAW_OHLCV_DIR, f"{symbol}.parquet"), index=False)
+
+
+def load_history(symbol: str, min_bars: int | None = None) -> pd.DataFrame | None:
+    bars = min_bars if min_bars is not None else cfg.min_bars_required()
+    df = store.load_ohlcv(cfg.DB_PATH, symbol, bars)
     return _normalize_ohlcv(df) if df is not None else None
 
 
-def get_history(symbol: str, yf_symbol: str, force_refresh: bool = False) -> pd.DataFrame | None:
+def get_history(
+    symbol: str,
+    yf_symbol: str,
+    force_refresh: bool = False,
+    lookback_days: int | None = None,
+) -> pd.DataFrame | None:
+    min_bars = cfg.min_bars_required()
     if not force_refresh:
-        cached = load_history(symbol)
+        cached = load_history(symbol, min_bars=min_bars)
         if cached is not None:
             return cached
 
-    df = fetch_history_from_yahoo(yf_symbol)
+    df = fetch_history_from_yahoo(yf_symbol, lookback_days=lookback_days)
     if df is not None:
         save_history(symbol, df)
     return df

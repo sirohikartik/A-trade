@@ -1,0 +1,22 @@
+# Explicit train / validation / test date ranges for dataset export.
+# null end = latest bar in processed data; null start = earliest bar.
+# When using --days (dev fetch), build_dataset.py auto-splits the loaded
+# window and overwrites data/datasets/splits.yaml with the actual ranges used.
+
+splits:
+  train:
+    start: null
+    end: "2023-06-30"
+  validation:
+    start: "2023-07-01"
+    end: "2024-12-31"
+  test:
+    start: "2025-01-01"
+    end: null
+    enabled: true
+
+# Used only when --days is set (short test runs)
+dev_auto_split:
+  train_ratio: 0.60
+  validation_ratio: 0.20
+  test_ratio: 0.20

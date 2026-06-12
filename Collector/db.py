@@ -123,6 +123,20 @@ def save_ohlcv(path: str, symbol: str, df: pd.DataFrame) -> None:
             conn.close()
 
 
+def list_symbols(path: str) -> list[str]:
+    if not os.path.isfile(path):
+        return []
+    with _lock:
+        conn = connect(path, read_only=True)
+        try:
+            rows = conn.execute(
+                "SELECT DISTINCT symbol FROM ohlcv_daily ORDER BY symbol"
+            ).fetchall()
+            return [r[0] for r in rows]
+        finally:
+            conn.close()
+
+
 def load_ohlcv(path: str, symbol: str, min_bars: int) -> pd.DataFrame | None:
     if not os.path.isfile(path):
         return None
