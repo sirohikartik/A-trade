@@ -1,0 +1,479 @@
+symbol,sector
+INTELLECT,Technology
+M&M,Consumer Cyclical
+CDSL,Financial Services
+TATASTEEL,Basic Materials
+JPPOWER,Utilities
+KARURVYSYA,Financial Services
+SHREECEM,Basic Materials
+DLF,Real Estate
+FORCEMOT,Consumer Cyclical
+JWL,Industrials
+TATACHEM,Basic Materials
+COLPAL,Consumer Defensive
+GODREJIND,Industrials
+STARHEALTH,Financial Services
+ZEEL,Communication Services
+ABB,Industrials
+NBCC,Industrials
+APOLLOTYRE,Consumer Cyclical
+APARINDS,Industrials
+CASTROLIND,Energy
+ESCORTS,Industrials
+HEROMOTOCO,Consumer Cyclical
+ICICIGI,Financial Services
+INDIAMART,Communication Services
+TITAGARH,Industrials
+JIOFIN,Financial Services
+JYOTICNC,Industrials
+ITI,Technology
+BSOFT,Technology
+GODREJCP,Consumer Defensive
+DMART,Consumer Defensive
+KAJARIACER,Industrials
+NTPC,Utilities
+CCL,Consumer Defensive
+ELGIEQUIP,Industrials
+NEULANDLAB,Healthcare
+OIL,Energy
+FLUOROCHEM,Basic Materials
+ABBOTINDIA,Healthcare
+KAYNES,Technology
+CUMMINSIND,Industrials
+GALLANTT,Basic Materials
+TIMKEN,Industrials
+GRAPHITE,Industrials
+TVSMOTOR,Consumer Cyclical
+BSE,Financial Services
+HAVELLS,Industrials
+INDIANB,Financial Services
+JBCHEPHARM,Healthcare
+RAINBOW,Healthcare
+AFFLE,Communication Services
+ACE,Industrials
+CANFINHOME,Financial Services
+DEEPAKFERT,Basic Materials
+MAPMYINDIA,Technology
+NEWGEN,Technology
+RAILTEL,Communication Services
+CGPOWER,Industrials
+SUNPHARMA,Healthcare
+PVRINOX,Communication Services
+SAIL,Basic Materials
+VIJAYA,Healthcare
+VOLTAS,Consumer Cyclical
+THERMAX,Industrials
+SAREGAMA,Communication Services
+JKCEMENT,Basic Materials
+LICI,Financial Services
+CAMS,Technology
+WELCORP,Basic Materials
+AUROPHARMA,Healthcare
+DELHIVERY,Industrials
+GRASIM,Basic Materials
+CHOICEIN,Financial Services
+MANAPPURAM,Financial Services
+BBTC,Consumer Defensive
+BRIGADE,Real Estate
+GRAVITA,Industrials
+SBILIFE,Financial Services
+MFSL,Financial Services
+IFCI,Financial Services
+MARUTI,Consumer Cyclical
+USHAMART,Basic Materials
+RADICO,Consumer Defensive
+TRITURBINE,Industrials
+RRKABEL,Industrials
+SONACOMS,Consumer Cyclical
+MPHASIS,Technology
+VTL,Consumer Cyclical
+AXISBANK,Financial Services
+EMAMILTD,Consumer Defensive
+IRB,Industrials
+BALRAMCHIN,Consumer Defensive
+BANKINDIA,Financial Services
+EIHOTEL,Consumer Cyclical
+AMBUJACEM,Basic Materials
+NESTLEIND,Consumer Defensive
+UNOMINDA,Consumer Cyclical
+RAMCOCEM,Basic Materials
+HINDZINC,Basic Materials
+OBEROIRLTY,Real Estate
+BALKRISIND,Consumer Cyclical
+TCS,Technology
+GABRIEL,Consumer Cyclical
+BERGEPAINT,Basic Materials
+RHIM,Industrials
+TORNTPOWER,Utilities
+JINDALSAW,Basic Materials
+SRF,Industrials
+NLCINDIA,Utilities
+HEG,Industrials
+JKTYRE,Consumer Cyclical
+SARDAEN,Basic Materials
+ECLERX,Technology
+SOLARINDS,Basic Materials
+IOB,Financial Services
+MINDACORP,Consumer Cyclical
+POLYMED,Healthcare
+BLUEDART,Industrials
+JUBLFOOD,Consumer Cyclical
+HINDUNILVR,Consumer Defensive
+ADANIGREEN,Utilities
+HOMEFIRST,Financial Services
+CYIENT,Industrials
+POWERGRID,Utilities
+ICICIPRULI,Financial Services
+BANDHANBNK,Financial Services
+IEX,Financial Services
+CUB,Financial Services
+INOXWIND,Industrials
+HFCL,Technology
+LT,Industrials
+NAM-INDIA,Financial Services
+BLUESTARCO,Industrials
+GAIL,Utilities
+POONAWALLA,Financial Services
+JSWENERGY,Utilities
+SOBHA,Real Estate
+SBFC,Financial Services
+BLUEJET,Healthcare
+AAVAS,Financial Services
+MARICO,Consumer Defensive
+JINDALSTEL,Basic Materials
+UNIONBANK,Financial Services
+ASTERDM,Healthcare
+ZENSARTECH,Technology
+AUBANK,Financial Services
+NATCOPHARM,Healthcare
+BIOCON,Healthcare
+FSL,Technology
+BAJAJ-AUTO,Consumer Cyclical
+INDUSINDBK,Financial Services
+MMTC,Industrials
+SUNDARMFIN,Financial Services
+CHENNPETRO,Energy
+GESHIP,Industrials
+HINDCOPPER,Basic Materials
+DRREDDY,Healthcare
+JMFINANCIL,Financial Services
+CRISIL,Financial Services
+LTFOODS,Consumer Defensive
+MAHABANK,Financial Services
+CANBK,Financial Services
+PAYTM,Technology
+UPL,Basic Materials
+KEC,Industrials
+KEI,Industrials
+NAVA,Industrials
+MGL,Utilities
+LATENTVIEW,Industrials
+BDL,Industrials
+BEML,Industrials
+EIDPARRY,Basic Materials
+NUVOCO,Basic Materials
+ASAHIINDIA,Consumer Cyclical
+PIIND,Basic Materials
+LEMONTREE,Consumer Cyclical
+DCMSHRIRAM,Industrials
+GODFRYPHLP,Consumer Defensive
+ZYDUSLIFE,Healthcare
+MANKIND,Healthcare
+PTCIL,Industrials
+ARE&M,Unknown
+SJVN,Unknown
+HUDCO,Unknown
+IGL,Unknown
+HINDALCO,Unknown
+LALPATHLAB,Unknown
+ELECON,Unknown
+TATAPOWER,Unknown
+YESBANK,Unknown
+ABCAPITAL,Unknown
+FEDERALBNK,Unknown
+INDUSTOWER,Unknown
+FIVESTAR,Unknown
+BAYERCROP,Unknown
+GLAND,Unknown
+TITAN,Unknown
+SYNGENE,Unknown
+PAGEIND,Unknown
+ANGELONE,Unknown
+ATUL,Unknown
+UTIAMC,Unknown
+VBL,Unknown
+ZFCVINDIA,Unknown
+GPIL,Unknown
+SAPPHIRE,Unknown
+CENTRALBK,Unknown
+OFSS,Unknown
+IRFC,Unknown
+PGEL,Unknown
+FINCABLES,Unknown
+TORNTPHARM,Unknown
+SCI,Unknown
+JSWINFRA,Unknown
+SCHNEIDER,Unknown
+CARTRADE,Unknown
+COFORGE,Unknown
+DIVISLAB,Unknown
+IRCON,Unknown
+HAL,Unknown
+AMBER,Unknown
+BAJFINANCE,Unknown
+TECHM,Unknown
+BPCL,Unknown
+PNBHOUSING,Unknown
+CARBORUNIV,Unknown
+ASIANPAINT,Unknown
+CHAMBLFERT,Unknown
+RPOWER,Unknown
+HDFCAMC,Unknown
+ULTRACEMCO,Unknown
+KPRMILL,Unknown
+FORTIS,Unknown
+SONATSOFTW,Unknown
+BRITANNIA,Unknown
+ADANIPORTS,Unknown
+M&MFIN,Unknown
+SHYAMMETL,Unknown
+INDIGO,Unknown
+IOC,Unknown
+PNB,Unknown
+BLS,Unknown
+INDHOTEL,Unknown
+CREDITACC,Unknown
+BHARTIARTL,Unknown
+HDFCLIFE,Unknown
+HDFCBANK,Unknown
+TEGA,Unknown
+CGCL,Unknown
+TRIDENT,Unknown
+SPLPETRO,Unknown
+FACT,Unknown
+NUVAMA,Unknown
+BHARTIHEXA,Unknown
+KIMS,Unknown
+EXIDEIND,Unknown
+NMDC,Unknown
+LICHSGFIN,Unknown
+HSCL,Unknown
+SBIN,Unknown
+ZYDUSWELL,Unknown
+KIRLOSENG,Unknown
+TATACONSUM,Unknown
+ADANIENT,Unknown
+NH,Unknown
+COCHINSHIP,Unknown
+MCX,Unknown
+PIDILITIND,Unknown
+BIKAJI,Unknown
+APOLLOHOSP,Unknown
+ASHOKLEY,Unknown
+ITC,Unknown
+LTTS,Unknown
+MOTHERSON,Unknown
+SYRMA,Unknown
+RECLTD,Unknown
+LINDEINDIA,Unknown
+JUBLPHARMA,Unknown
+PFC,Unknown
+PETRONET,Unknown
+VEDL,Unknown
+IDBI,Unknown
+HINDPETRO,Unknown
+DATAPATTNS,Unknown
+ABSLAMC,Unknown
+MRPL,Unknown
+SUNTV,Unknown
+ENGINERSIN,Unknown
+NCC,Unknown
+AIIL,Unknown
+MUTHOOTFIN,Unknown
+BHEL,Unknown
+DEEPAKNTR,Unknown
+WIPRO,Unknown
+ADANIPOWER,Unknown
+J&KBANK,Unknown
+CAPLIPOINT,Unknown
+MAZDOCK,Unknown
+EICHERMOT,Unknown
+JSWSTEEL,Unknown
+NATIONALUM,Unknown
+ABFRL,Unknown
+CONCOR,Unknown
+NIACL,Unknown
+CONCORDBIO,Unknown
+LTF,Unknown
+SHRIRAMFIN,Unknown
+ANANTRAJ,Unknown
+GLAXO,Unknown
+HONAUT,Unknown
+TECHNOE,Unknown
+SBICARD,Unknown
+MSUMI,Unknown
+WHIRLPOOL,Unknown
+GLENMARK,Unknown
+NHPC,Unknown
+BAJAJFINSV,Unknown
+OLECTRA,Unknown
+KFINTECH,Unknown
+LUPIN,Unknown
+DEVYANI,Unknown
+BANKBARODA,Unknown
+3MINDIA,Unknown
+BATAINDIA,Unknown
+AIAENG,Unknown
+SUMICHEM,Unknown
+DABUR,Unknown
+TATAELXSI,Unknown
+KPITTECH,Unknown
+KPIL,Unknown
+LLOYDSME,Unknown
+DOMS,Unknown
+PRESTIGE,Unknown
+ALKEM,Unknown
+POLYCAB,Unknown
+HCLTECH,Unknown
+TTML,Unknown
+TATACOMM,Unknown
+POLICYBZR,Unknown
+ZENTEC,Unknown
+GICRE,Unknown
+DALBHARAT,Unknown
+ICICIBANK,Unknown
+ACC,Unknown
+REDINGTON,Unknown
+BEL,Unknown
+MRF,Unknown
+CHALET,Unknown
+JSL,Unknown
+PARADEEP,Unknown
+POWERINDIA,Unknown
+MOTILALOFS,Unknown
+PFIZER,Unknown
+ENDURANCE,Unknown
+SCHAEFFLER,Unknown
+SUZLON,Unknown
+PHOENIXLTD,Unknown
+RBLBANK,Unknown
+NETWEB,Unknown
+PATANJALI,Unknown
+IIFL,Unknown
+IPCALAB,Unknown
+NYKAA,Unknown
+RVNL,Unknown
+CHOLAHLDNG,Unknown
+NAUKRI,Unknown
+MEDANTA,Unknown
+LAURUSLABS,Unknown
+CLEAN,Unknown
+IDFCFIRSTB,Unknown
+PPLPHARMA,Unknown
+RITES,Unknown
+JUBLINGREA,Unknown
+TRENT,Unknown
+PCBL,Unknown
+RKFORGE,Unknown
+DIXON,Unknown
+BHARATFORG,Unknown
+TIINDIA,Unknown
+CIPLA,Unknown
+RELIANCE,Unknown
+CHOLAFIN,Unknown
+IREDA,Unknown
+TATAINVEST,Unknown
+SUPREMEIND,Unknown
+ANANDRATHI,Unknown
+GMDCLTD,Unknown
+CROMPTON,Unknown
+AWL,Unknown
+UCOBANK,Unknown
+BAJAJHLDNG,Unknown
+ERIS,Unknown
+APTUS,Unknown
+SIEMENS,Unknown
+BOSCHLTD,Unknown
+COROMANDEL,Unknown
+CEATLTD,Unknown
+GILLETTE,Unknown
+NAVINFLUOR,Unknown
+UBL,Unknown
+NSLNISP,Unknown
+PERSISTENT,Unknown
+GRANULES,Unknown
+TEJASNET,Unknown
+APLAPOLLO,Unknown
+CIEINDIA,Unknown
+ADANIENSOL,Unknown
+SIGNATURE,Unknown
+TATATECH,Unknown
+ASTRAL,Unknown
+MAXHEALTH,Unknown
+KALYANKJIL,Unknown
+GRSE,Unknown
+KOTAKBANK,Unknown
+INDIACEM,Unknown
+INFY,Unknown
+AJANTPHARM,Unknown
+ANURAS,Unknown
+AARTIIND,Unknown
+GODREJPROP,Unknown
+CRAFTSMAN,Unknown
+IRCTC,Unknown
+JBMA,Unknown
+COALINDIA,Unknown
+360ONE,Unknown
+WOCKPHARMA,Unknown
+ATGL,Unknown
+IDEA,Unknown
+CESC,Unknown
+ONGC,Unknown
+LODHA,Unknown
+WELSPUNLIV,Unknown
+HONASA,Unknown
+AADHARHFC,Small Cap
+ABDL,Small Cap
+ABREL,Small Cap
+ACMESOLAR,Small Cap
+ACUTAAS,Small Cap
+AEGISLOG,Small Cap
+AEGISVOPAK,Small Cap
+AFCONS,Small Cap
+ATHERENERG,Small Cap
+BAJAJHFL,Mid Cap
+BELRISE,Small Cap
+CEMPRO,Small Cap
+COHANCE,Small Cap
+EMCURE,Small Cap
+ETERNAL,Large Cap
+FIRSTCRY,Small Cap
+GMRAIRPORT,Mid Cap
+GODIGIT,Small Cap
+GVT&D,Mid Cap
+HBLENGINE,Small Cap
+HEXT,Mid Cap
+HYUNDAI,Large Cap
+IGIL,Small Cap
+IKS,Small Cap
+INDGN,Small Cap
+ITCHOTELS,Mid Cap
+JSWDULUX,Small Cap
+LTM,Large Cap
+NIVABUPA,Small Cap
+NTPCGREEN,Mid Cap
+OLAELEC,Small Cap
+ONESOURCE,Small Cap
+PREMIERENE,Mid Cap
+SAGILITY,Small Cap
+SAILIFE,Small Cap
+SAMMAANCAP,Small Cap
+SWANCORP,Small Cap
+SWIGGY,Mid Cap
+TARIL,Small Cap
+TBOTEK,Small Cap
+THELEELA,Small Cap
+TMPV,Large Cap
+UNITDSPR,Large Cap
+VMM,Mid Cap
+WAAREEENER,Mid Cap

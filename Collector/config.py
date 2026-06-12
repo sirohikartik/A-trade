@@ -1,5 +1,7 @@
-"""
-Scanner and pipeline settings — edit values here or override via config/settings.yaml
+"""Paths and runtime settings for the scanner and dataset pipeline.
+
+Defaults load from ``config/settings.yaml``. ``build_dataset.py`` may call
+``set_runtime()`` for dev flags (``--days``, ``--max-symbols``).
 """
 
 import os
@@ -29,6 +31,7 @@ _RUNTIME: dict = {}
 
 
 def set_runtime(**kwargs) -> None:
+    """Override fetch window and symbol limits for a single CLI run."""
     _RUNTIME.update({k: v for k, v in kwargs.items() if v is not None})
 
 
@@ -106,16 +109,10 @@ RAW_BHAVCOPY_DIR = os.path.join(DATA_DIR, "raw", "bhavcopy")
 PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
 COMBINED_DIR = os.path.join(PROCESSED_DIR, "combined")
 SEGMENTS_DIR = os.path.join(PROCESSED_DIR, "segments")
-DATASETS_DIR = os.path.join(DATA_DIR, "datasets")
-TABULAR_DIR = os.path.join(DATASETS_DIR, "tabular")
-SEQUENCES_DIR = os.path.join(DATASETS_DIR, "sequences")
-# Back-compat alias
-ML_DIR = TABULAR_DIR
 SEGMENT_MAP_PATH = os.path.join(PROCESSED_DIR, "segment_map.parquet")
 UNIVERSE_RANKINGS_PATH = os.path.join(PROCESSED_DIR, "universe_rankings.parquet")
-UNIVERSE_TOP_N_PATH = os.path.join(DATASETS_DIR, "universe_top_n.json")
+UNIVERSE_TOP_N_PATH = os.path.join(PROCESSED_DIR, "universe_top_n.json")
 MARKET_BREADTH_PATH = os.path.join(PROCESSED_DIR, "market_breadth.parquet")
-FEATURE_MANIFEST_PATH = os.path.join(DATASETS_DIR, "manifest.yaml")
+SPLITS_PATH = os.path.join(DATA_DIR, "splits.yaml")
 
 LABELS_PATH = os.path.join(CONFIG_DIR, "labels.yaml")
-ML_CONFIG_PATH = os.path.join(CONFIG_DIR, "ml.yaml")

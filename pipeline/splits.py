@@ -16,7 +16,7 @@ if _COLLECTOR not in sys.path:
 import config as cfg
 
 SPLITS_CONFIG_PATH = os.path.join(cfg.CONFIG_DIR, "splits.yaml")
-SPLITS_OUTPUT_PATH = os.path.join(cfg.DATASETS_DIR, "splits.yaml")
+SPLITS_OUTPUT_PATH = cfg.SPLITS_PATH
 
 
 def _load_splits_config() -> dict:
@@ -122,9 +122,9 @@ def mask_split(df: pd.DataFrame, split_name: str, bounds: dict) -> pd.Series:
 
 
 def write_splits_file(bounds: dict) -> str:
-    os.makedirs(cfg.DATASETS_DIR, exist_ok=True)
+    os.makedirs(cfg.DATA_DIR, exist_ok=True)
     doc = {
-        "description": "Resolved train / validation / test date ranges used for dataset export",
+        "description": "Resolved train / validation / test date ranges for research and blast EA",
         **bounds,
     }
     with open(SPLITS_OUTPUT_PATH, "w", encoding="utf-8") as f:

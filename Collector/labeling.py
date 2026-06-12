@@ -1,4 +1,4 @@
-"""Outcome labeling — dual profiles (reference + segment swing)."""
+"""Outcome labeling — reference 3-day swing profile."""
 
 from __future__ import annotations
 
@@ -78,17 +78,18 @@ def label_single_stock(
             if i + j >= n:
                 break
 
-            row_j = df.iloc[i + j]
-            day_high = float(row_j["high"])
-            day_low = float(row_j["low"])
-            day_open = float(row_j["open"])
-            day_close = float(row_j["close"])
+            row = df.iloc[i + j]
+            high = float(row["high"])
+            low = float(row["low"])
 
-            max_fav = max(max_fav, (day_high - entry) / entry)
-            max_adv = min(max_adv, (day_low - entry) / entry)
+            day_open = float(row["open"])
+            day_close = float(row["close"])
 
-            day_hit_target = day_high >= target
-            day_hit_stop = day_low <= stop
+            max_fav = max(max_fav, (high - entry) / entry)
+            max_adv = min(max_adv, (low - entry) / entry)
+
+            day_hit_target = high >= target
+            day_hit_stop = low <= stop
 
             if day_hit_target and not day_hit_stop:
                 outcome = 1
@@ -160,19 +161,22 @@ def apply_profile_labels(df: pd.DataFrame, profile: str, segment: str) -> pd.Dat
     return df
 
 
-def label_stock_all_profiles(df: pd.DataFrame, segment: str) -> pd.DataFrame:
+def label_stock(df: pd.DataFrame, segment: str) -> pd.DataFrame:
+    """Apply the active label profile and set ``outcome`` = ``outcome_reference``."""
+    """Apply reference_swing labels and set primary outcome columns."""
     df = apply_profile_labels(df, "reference_swing", segment)
-    df = apply_profile_labels(df, "segment_swing", segment)
 
-    df["outcome"] = df["outcome_segment"]
-    df["ambiguous"] = df["segment_swing_ambiguous"]
+    df["outcome"] = df["outcome_reference"]
+    df["ambiguous"] = df["reference_swing_ambiguous"]
 
-    fwd_ref = int(get_profile_params("reference_swing", segment)["forward_days"])
-    fwd_seg = int(get_profile_params("segment_swing", segment)["forward_days"])
-    max_fwd = max(fwd_ref, fwd_seg)
+    fwd = int(get_profile_params("reference_swing", segment)["forward_days"])
 
-    df = df.dropna(subset=["outcome_reference", "outcome_segment"])
-    if len(df) > max_fwd:
-        df = df.iloc[:-max_fwd]
+    df = df.dropna(subset=["outcome_reference"])
+    if len(df) > fwd:
+        df = df.iloc[:-fwd]
 
     return df
+
+
+# Back-compat alias
+label_stock_all_profiles = label_stock

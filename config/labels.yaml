@@ -6,23 +6,5 @@ profiles:
     forward_days: 3
     per_segment: false
 
-  segment_swing:
-    description: "Segment-specific swing targets"
-    per_segment: true
-    segments:
-      large_cap:
-        target_pct: 0.08
-        stop_pct: 0.04
-        forward_days: 10
-      mid_cap:
-        target_pct: 0.10
-        stop_pct: 0.05
-        forward_days: 15
-      small_cap:
-        target_pct: 0.12
-        stop_pct: 0.06
-        forward_days: 15
-
 output_columns:
   reference_swing: outcome_reference
-  segment_swing: outcome_segment

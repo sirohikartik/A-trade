@@ -2,7 +2,7 @@
 Rank Nifty 500 symbols by historical edge on the training window.
 
 Uses only train-period rows (no validation leakage) to pick top-N names
-for a focused ML/DL dataset.
+for a focused research subset.
 """
 
 from __future__ import annotations
@@ -154,7 +154,7 @@ def select_top_n(df: pd.DataFrame, top_n: int) -> tuple[pd.DataFrame, list[str],
         "top_symbols": selected.to_dict(orient="records"),
     }
     meta_path = cfg.UNIVERSE_TOP_N_PATH
-    os.makedirs(cfg.DATASETS_DIR, exist_ok=True)
+    os.makedirs(cfg.PROCESSED_DIR, exist_ok=True)
     with open(meta_path, "w", encoding="utf-8") as f:
         json.dump(meta, f, indent=2)
 

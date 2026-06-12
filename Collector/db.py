@@ -17,11 +17,13 @@ def db_path(base_dir: str) -> str:
 
 
 def connect(path: str, read_only: bool = False) -> duckdb.DuckDBPyConnection:
+    """Open (or create) the DuckDB file at ``path``."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return duckdb.connect(path, read_only=read_only)
 
 
 def init_schema(conn: duckdb.DuckDBPyConnection) -> None:
+    """Create OHLCV, symbol_meta, and scan result tables if missing."""
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS ohlcv_daily (

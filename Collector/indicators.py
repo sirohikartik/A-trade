@@ -42,6 +42,7 @@ def _ensure_date_column(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def add_indicators(df: pd.DataFrame, rules: dict[str, Any] | None = None) -> pd.DataFrame:
+    """Add Reference-aligned technical columns (EMAs, RSI, MACD, ADX, highs, etc.)."""
     rules = rules or get_reference_rules()
     params = get_indicator_params()
 
@@ -168,6 +169,7 @@ def add_indicators(df: pd.DataFrame, rules: dict[str, Any] | None = None) -> pd.
 
 
 def add_delivery_features(df: pd.DataFrame, rules: dict[str, Any] | None = None) -> pd.DataFrame:
+    """Merge NSE delivery % features when bhavcopy columns are present."""
     rules = rules or get_reference_rules()
     delivery_min = rules.get("delivery_pct_min", 50)
 

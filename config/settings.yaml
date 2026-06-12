@@ -40,14 +40,6 @@ reference_rules:
   near_20d_high_pct: 0.98
   near_52w_high_pct: 0.97
 
-ml:
-  rolling_zscore_window: 60
-  lag_periods: [1, 2, 3]
-  sequence_length: 20
-  label_profiles:
-    - reference_swing
-    - segment_swing
-
 # Top-N universe selection (train-period ranking, no val leakage)
 universe:
   min_setup_signals: 8

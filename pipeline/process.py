@@ -20,7 +20,7 @@ import config as cfg
 import db as store
 from delivery import load_all_delivery
 from indicators import add_delivery_features, add_indicators
-from labeling import label_stock_all_profiles
+from labeling import label_stock
 from segments import build_segment_map
 
 
@@ -87,11 +87,12 @@ def _process_symbol_pass2(
     df["market_breadth"] = df["market_breadth"].fillna(0.5)
     df.to_parquet(fpath, index=False)
 
-    labeled = label_stock_all_profiles(df, segment)
+    labeled = label_stock(df, segment)
     return labeled if len(labeled) > 0 else None
 
 
 def process_all_symbols(symbols: list[str] | None = None) -> None:
+    """Build segment parquets: indicators, delivery, reference labels, breadth."""
     settings = _load_settings()
     filters = settings.get("filters", {})
     min_history = cfg.min_bars_required()
@@ -187,8 +188,7 @@ def process_all_symbols(symbols: list[str] | None = None) -> None:
         seg_df.to_parquet(os.path.join(cfg.SEGMENTS_DIR, f"{seg}.parquet"), index=False)
         print(
             f"  {seg}: {len(seg_df)} rows | "
-            f"ref={seg_df['outcome_reference'].mean():.1%} | "
-            f"seg={seg_df['outcome_segment'].mean():.1%}"
+            f"ref={seg_df['outcome_reference'].mean():.1%}"
         )
 
     full.to_parquet(os.path.join(cfg.SEGMENTS_DIR, "all.parquet"), index=False)

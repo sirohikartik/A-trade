@@ -1,6 +1,39 @@
 # A-trade
 
-Indian equity research pipeline built around **Nifty 500**. Fetches daily OHLCV and NSE bhavcopy delivery data, computes Reference-aligned technical indicators, labels swing-trade outcomes, and exports **ML tabular** and **DL sequence** datasets with one command.
+Indian equity research pipeline for **Nifty 500** swing setups. Fetches daily OHLCV and NSE delivery data, computes Reference-aligned indicators, labels **reference 3-day swing** outcomes, scores candidates with a **seven-factor blast engine**, and tunes factor weights with a hybrid evolutionary optimizer.
+
+## What it does
+
+```mermaid
+flowchart LR
+  subgraph ingest [Ingest]
+    YF[Yahoo OHLCV]
+    NSE[NSE bhavcopy]
+  end
+  subgraph process [Process]
+    IND[Indicators]
+    LAB[Reference labels]
+    SEG[Cap segments]
+  end
+  subgraph score [Score]
+    BLAST[Blast 7-factor]
+    EA[Hybrid EA tune]
+  end
+  subgraph live [Live]
+    SCAN[Collector scanner]
+  end
+  YF --> IND
+  NSE --> IND
+  IND --> LAB --> SEG
+  SEG --> BLAST --> EA
+  IND --> SCAN --> BLAST
+```
+
+| Stage | Entry point | Output |
+|-------|-------------|--------|
+| Dataset build | `build_dataset.py` | Segment parquets, `data/splits.yaml` |
+| Blast smoke / tune | `python -m blast.smoke`, `python -m blast.tune_weights` | Ranked picks, tuned `weights_*.yaml` |
+| Live scan | `python Collector/start.py` | DuckDB scan runs with `blast_score` |
 
 ## Quick start
 
@@ -10,28 +43,26 @@ pip install -r requirements.txt
 python build_dataset.py
 ```
 
-That builds **both** ML parquet and DL `.npz` files in phase 5. There is no separate DL script.
-
-### Recommended dev / smoke test
+### Dev smoke test (fast)
 
 ```powershell
-# Wipe generated data, fetch 120 days, 15 symbols, include bhavcopy
 python build_dataset.py --days 120 --max-symbols 15 --fresh
+python -m blast.smoke --segment mid_cap --top-n 10
 ```
 
 Use `--skip-delivery` only when you want a faster run without delivery features.
 
-## Commands cheat sheet
+## Dataset pipeline
 
-Run from the `A-trade/` folder:
+Five phases run in order when you call `build_dataset.py`:
 
-| Goal | Command |
-|------|---------|
-| Full pipeline — ML + DL, all Nifty 500 | `python build_dataset.py` |
-| Full pipeline — top N by train-period edge | `python build_dataset.py --top-n 100` |
-| Rebuild from cached OHLCV (skip download) | `python build_dataset.py --skip-fetch --skip-delivery` |
-| Dev smoke test (longer window + bhavcopy) | `python build_dataset.py --days 120 --max-symbols 15 --fresh` |
-| Fast dev (no delivery) | `python build_dataset.py --days 30 --max-symbols 20 --skip-delivery` |
+| Phase | What it does | Output |
+|-------|--------------|--------|
+| 1 | Fetch OHLCV (Yahoo) | `data/atrade.duckdb`, `data/raw/ohlcv/` |
+| 2 | Fetch NSE bhavcopy delivery | `data/raw/bhavcopy/` |
+| 3 | Cap-segment map | `data/processed/segment_map.parquet` |
+| 4 | Indicators + reference labels | `data/processed/segments/*.parquet` |
+| 5 | Splits + optional top-N | `data/splits.yaml` |
 
 ### CLI flags
 
@@ -39,291 +70,133 @@ Run from the `A-trade/` folder:
 |------|-------------|
 | `--days N` | Fetch only last N calendar days; lowers min bars; auto 60/20/20 split |
 | `--max-symbols N` | Limit to first N Nifty 500 tickers |
-| `--top-n N` | Rank on train window only; export top N symbols |
+| `--top-n N` | Rank on train window only; filter to top N symbols |
 | `--skip-fetch` | Reuse cached DuckDB OHLCV |
-| `--skip-delivery` | Skip NSE bhavcopy (no `delivery_pct` from exchange) |
+| `--skip-delivery` | Skip NSE bhavcopy |
 | `--refresh` | Force re-download OHLCV from Yahoo |
-| `--fresh` | Delete entire `data/` folder and rebuild from scratch |
+| `--fresh` | Delete generated data and rebuild |
 
-## Pipeline (five phases)
+### Label profile
 
-| Phase | What it does | Output |
-|-------|----------------|--------|
-| 1 | Download Nifty 500 OHLCV (Yahoo) | `data/atrade.duckdb` + `data/raw/ohlcv/{SYMBOL}.parquet` |
-| 2 | Download NSE bhavcopy delivery % | `data/raw/bhavcopy/{YYYY-MM-DD}.parquet` |
-| 3 | Classify large/mid/small cap | `data/processed/segment_map.parquet` |
-| 4 | Indicators + dual labels | `data/processed/combined/`, `data/processed/segments/` |
-| 5 | ML + DL datasets | `data/datasets/tabular/`, `data/datasets/sequences/` |
+Single profile: **reference_swing** (3-day swing, next-open entry).
 
-Progress bars (`tqdm`) run on OHLCV fetch, bhavcopy fetch, indicators, and labeling. Symbol-level work uses parallel thread pools (`fetch.workers`, `fetch.delivery_workers` in config).
+| Parameter | Value |
+|-----------|-------|
+| Target | +4% |
+| Stop | −2.5% |
+| Forward days | 3 |
+| Outcome column | `outcome_reference` |
 
-## Output paths
+Defined in `config/labels.yaml`. Indicator thresholds in `config/settings.yaml` → `reference_rules`.
 
-| Artifact | Path |
-|----------|------|
-| ML tabular | `data/datasets/tabular/ml_{train,val,test}_{profile}.parquet` |
-| DL sequences | `data/datasets/sequences/dl_{train,val,test}_{profile}.npz` |
-| Resolved splits | `data/datasets/splits.yaml` |
-| Feature manifest | `data/datasets/manifest.yaml` |
-| Raw OHLCV | `data/raw/ohlcv/{SYMBOL}.parquet` |
-| DuckDB | `data/atrade.duckdb` (table `ohlcv_daily`) |
-| Bhavcopy | `data/raw/bhavcopy/{YYYY-MM-DD}.parquet` |
-| Bhavcopy failures | `data/raw/failed_bhavcopy_dates.csv` (if any) |
+## Blast scoring
 
-With `--top-n N`, filenames include `top{N}` (e.g. `ml_train_top100_reference_swing.parquet`).
+Seven weighted factors (weights sum to **100**). Sub-scores are fixed in v1; the EA tunes weights only.
 
----
+| Factor | Role |
+|--------|------|
+| Trend | EMA stack, slope, ADX |
+| Breakout | 52w/20d highs, close position |
+| Volume | Volume ratio vs 20d average |
+| Delivery | NSE delivery % |
+| Momentum | RSI, MACD, ADX rising |
+| Sector | Sector breadth (% above EMA20) |
+| Risk | ATR extension, liquidity |
 
-## Dataset shapes and columns
+**Alert bands:** 85+ A+, 75–84 A, 65–74 B, below 65 ignored.
 
-### ML tabular (parquet)
+Liquidity and macro filters gate the **daily ranking pool** but do not zero `blast_score`.
 
-**Layout:** one row per **symbol-day**.
+### Commands
 
-**Typical shape:** `(rows, 57)` where rows depend on universe, history, and split.
+```powershell
+# Top picks for latest day (or --date YYYY-MM-DD)
+python -m blast.smoke --segment mid_cap --top-n 10
 
-| Column group | Count | Names |
-|--------------|-------|-------|
-| Meta | 3 | `symbol`, `date`, `segment` |
-| Target | 1 | `outcome_reference` or `outcome_segment` |
-| Features | 52 | See feature list below |
-| Training alias | 1 | `label` (copy of target) |
+# Baseline Precision@10 (blueprint weights)
+python -m blast.tune_weights --baseline-only
 
-**Example row counts** (15 symbols, `--days 120`, dev auto-split):
+# Tune weights — quick (~2 min/segment) or full (~30 min/segment)
+python -m blast.tune_weights --quick
+python -m blast.tune_weights
 
-| File | Rows | Target | Positive rate (approx.) |
-|------|------|--------|-------------------------|
-| `ml_train_reference_swing.parquet` | 417 | `outcome_reference` | 23% |
-| `ml_val_reference_swing.parquet` | 297 | `outcome_reference` | 37% |
-| `ml_test_reference_swing.parquet` | 243 | `outcome_reference` | 26% |
-| `ml_train_segment_swing.parquet` | 417 | `outcome_segment` | 16% |
-| `ml_val_segment_swing.parquet` | 297 | `outcome_segment` | 42% |
-| `ml_test_segment_swing.parquet` | 243 | `outcome_segment` | 19% |
-
-**Feature columns (52)** — defined in `config/ml.yaml`, extended in export:
-
-| Type | Examples |
-|------|----------|
-| Raw indicators | `rsi`, `adx`, `atr_pct`, `volume_ratio`, `ema20_slope`, `bb_width`, `delivery_pct`, `market_breadth`, `macd_hist`, `stoch_k`, … |
-| Binary flags | `ema_stack_bull`, `setup_ready`, `delivery_strong`, `new_20d_high`, `breakout_volume`, … |
-| Z-scores | `rsi_z`, `adx_z`, `delivery_pct_z`, … (rolling window in `settings.yaml` → `ml.rolling_zscore_window`) |
-| Lags | `rsi_lag1..3`, `volume_ratio_lag1..3`, `macd_hist_lag1..3` |
-
-Rows with NaN in core raw features are dropped before export (`null_policy` in manifest).
-
-**Inspect in Python:**
-
-```python
-import pandas as pd
-
-df = pd.read_parquet("data/datasets/tabular/ml_train_reference_swing.parquet")
-print(df.shape)
-print(df.columns.tolist())
-print(df[["symbol", "date", "segment", "outcome_reference", "rsi", "delivery_pct", "label"]].head())
+# Archive a run (logs + weights copied to runs/)
+python -m blast.tune_weights --run-label run_03
 ```
 
-### DL sequences (npz)
+### Weight files
 
-**Layout:** one sample per **symbol-day**; each sample is the last `seq_len` timesteps of features ending on that date.
+| Path | Purpose |
+|------|---------|
+| `data/blast/weights_{segment}.yaml` | Active tuned weights (scanner + research) |
+| `data/blast/standard/` | Frozen baseline (run_01) |
+| `data/blast/runs/run_XX/` | Archived manifest, logs, weight copies |
 
-**Typical `X` shape:** `(samples, seq_len, n_features)` e.g. `(117, 10, 52)` in dev mode.
+Optimizer picks the candidate with best **validation Precision@10** (seeds + differential evolution + Nelder-Mead polish). See [docs/BLAST_SCORE_IMPLEMENTATION_PLAN.md](docs/BLAST_SCORE_IMPLEMENTATION_PLAN.md) for design detail.
 
-| Key | Shape | Description |
-|-----|-------|-------------|
-| `X` | `(N, seq_len, F)` | Feature windows (float32) |
-| `y` | `(N,)` | Binary label (int8) |
-| `symbol` | `(N,)` | Ticker string |
-| `date` | `(N,)` | Signal date (end of window) |
+### Live scanner
 
-**Example sample counts** (same 15-symbol / 120-day run):
-
-| File | X shape | Notes |
-|------|---------|-------|
-| `dl_train_reference_swing.npz` | (117, 10, 52) | Fewer than ML train rows (needs full window) |
-| `dl_val_reference_swing.npz` | (147, 10, 52) | |
-| `dl_test_reference_swing.npz` | (93, 10, 52) | |
-
-`segment_swing` NPZ files use the same `X` but different `y` (segment-specific outcomes).
-
-**Why ML rows > DL samples:** ML keeps every clean symbol-day. DL drops days that do not have `seq_len` prior bars in the same split.
-
-**Load in Python:**
-
-```python
-import numpy as np
-
-d = np.load("data/datasets/sequences/dl_train_reference_swing.npz", allow_pickle=True)
-X, y, symbols, dates = d["X"], d["y"], d["symbol"], d["date"]
-print(X.shape)  # (samples, seq_len, features)
-print(symbols[0], dates[0], y[0])
-print(X[0, -1, :5])  # last timestep, first 5 features
+```powershell
+python Collector/start.py
 ```
 
----
-
-## Train / validation / test splits
-
-### Production (no `--days`)
-
-Edit **`config/splits.yaml`**:
-
-| Split | Default range |
-|-------|----------------|
-| Train | earliest data → `2023-06-30` |
-| Validation | `2023-07-01` → `2024-12-31` |
-| Test | `2025-01-01` → latest (`enabled: true`) |
-
-`null` start/end means “use earliest/latest bar in processed data”.
-
-### Dev mode (`--days N`)
-
-Splits are computed automatically from loaded trading days using ratios in `config/splits.yaml` → `dev_auto_split`:
-
-```yaml
-dev_auto_split:
-  train_ratio: 0.60
-  validation_ratio: 0.20
-  test_ratio: 0.20
-```
-
-**Example resolved ranges** (`--days 120`, 15 symbols) written to `data/datasets/splits.yaml`:
-
-| Split | Start | End |
-|-------|--------|-----|
-| Train | 2025-12-29 | 2026-03-25 |
-| Validation | 2026-03-27 | 2026-04-28 |
-| Test | 2026-04-29 | 2026-05-27 |
-
-After every build, **`data/datasets/splits.yaml`** and **`data/datasets/manifest.yaml`** record the actual ranges used. Top-N ranking always uses the **train** split only (no validation leakage).
-
----
-
-## Configuration reference
-
-All YAML lives under `config/`. Python loads via `Collector/config.py`.
-
-### `config/settings.yaml`
-
-| Section | Key | Default | Purpose |
-|---------|-----|---------|---------|
-| `data` | `years_of_history` | `5` | Production OHLCV lookback |
-| `data` | `calendar_buffer_days` | `45` | Extra days for indicators / bhavcopy |
-| `data` | `fetch_recent_days` | `null` | Set in YAML or override with `--days` |
-| `filters` | `min_history_days` | `250` | Min bars per symbol (production) |
-| `filters` | `dev_min_history_days` | `5` | Min bars when `--days` is set |
-| `indicators` | `ema_periods`, `rsi_period`, … | see file | Passed to `indicators.py` |
-| `reference_rules` | `rsi_min`, `volume_ratio_min`, … | see file | Setup / breakout thresholds |
-| `ml` | `rolling_zscore_window` | `60` | Z-score lookback |
-| `ml` | `lag_periods` | `[1, 2, 3]` | Lag feature offsets |
-| `ml` | `sequence_length` | `20` | DL window length (capped at **10** in dev `--days` mode) |
-| `universe` | `min_setup_signals` | `8` | Min setups to rank for `--top-n` |
-| `universe` | `ranking_weights` | see file | Top-N composite score weights |
-| `fetch` | `workers` | `5` | Parallel OHLCV downloads |
-| `fetch` | `delivery_workers` | `8` | Parallel bhavcopy downloads |
-
-**Lookback math:**
-
-- Production: `years_of_history * 365 + calendar_buffer_days`
-- Dev (`--days N`): `N + calendar_buffer_days` (used for both Yahoo and bhavcopy)
-
-### `config/splits.yaml`
-
-Production date boundaries and dev auto-split ratios (see above).
-
-### `config/labels.yaml`
-
-| Profile | Target | Stop | Horizon | Column |
-|---------|--------|------|---------|--------|
-| `reference_swing` | +4% | -2.5% | 3 days | `outcome_reference` |
-| `segment_swing` | 8–12% (by cap) | 4–6% | 10–15 days | `outcome_segment` |
-
-Entry is simulated at **next-day open**.
-
-### `config/ml.yaml`
-
-Lists `feature_columns` (raw + binary), `zscore_columns`, `lag_features`, and `label_profiles_for_training`. Add or remove features here to change exported columns (re-run phase 5 or full pipeline).
-
----
-
-## Top-N universe selection
-
-When `--top-n` is set, symbols are ranked using **only the train split**.
-
-| Signal bucket | Weight | Rule |
-|---------------|--------|------|
-| Setup win rate | 30% | `outcome_reference` when `setup_ready == 1` |
-| Breakout win rate | 20% | `new_20d_high` + volume + ATR filter |
-| Momentum win rate | 15% | RSI zone + MACD + ADX rising |
-| Delivery win rate | 10% | `delivery_strong == 1` |
-| Trend consistency | 10% | % days `ema_stack_bull` |
-| Volume edge | 5% | Avg volume ratio on setup days |
-| Liquidity | 5% | Median daily value (log-scaled) |
-| Avg setup return | 5% | Mean swing return on setups |
-
-Outputs: `data/processed/universe_rankings.parquet`, `data/datasets/universe_top_n.json`, `data/processed/segments/top_N.parquet`.
-
----
-
-## Indicators
-
-Implemented in `Collector/indicators.py`:
-
-- Trend: EMA 20/50/200, stack, slope, pullback
-- Momentum: RSI, MACD, Stochastic, ADX
-- Volatility: ATR, Bollinger width / squeeze / breakout
-- Volume: ratio, trend
-- Breakout: 20d / 52w highs, `breakout_volume`
-- Delivery: `delivery_pct` from bhavcopy, above avg, strong (>50%)
-- Composite: `setup_ready`
-
-Thresholds: `config/settings.yaml` → `reference_rules`.
-
----
+Downloads latest bars, computes indicators, scores with per-segment tuned weights, and stores symbols at or above the B band (65) in DuckDB scan tables.
 
 ## Project layout
 
 ```
 A-trade/
-  build_dataset.py          # Main entry — ML + DL export
+  build_dataset.py              # Five-phase dataset CLI
   Collector/
-    start.py                # Live breakout scanner
-    config.py               # Paths + YAML loader
-    db.py                   # DuckDB OHLCV
-    indicators.py
-    labeling.py
-    segments.py
-    delivery.py             # NSE bhavcopy
+    config.py                   # Paths; loads config/settings.yaml
+    db.py                       # DuckDB OHLCV + scan storage
+    delivery.py                 # NSE bhavcopy fetch
+    indicators.py               # Technical features (no lookahead)
+    labeling.py                 # Reference 3-day swing outcomes
+    segments.py                 # Large / mid / small cap mapping
+    start.py                    # Live scanner (blast scoring)
   pipeline/
-    fetch.py                # Bulk OHLCV (parallel + tqdm)
-    process.py              # Indicators + labels
-    splits.py               # Train/val/test resolution
-    universe.py             # Top-N ranking
-    features.py             # ML parquet + DL npz
+    fetch.py                    # Bulk Yahoo download
+    process.py                  # Indicators + labels → parquets
+    splits.py                   # Train / val / test ranges
+    universe.py                 # Top-N train-period ranking
+  blast/
+    scoring.py                  # Sub-scores + blast_score + ranking
+    filters.py                  # Eligibility pool (price, ADTV, breadth)
+    enrich.py                   # Load parquets + sector_breadth
+    live.py                     # Live batch scoring
+    explain.py                  # Per-row factor breakdown
+    tune_weights.py             # Hybrid EA CLI
+    smoke.py                    # One-day smoke test
+    categories/                 # Seven sub-score functions
+    optimize/                   # Fitness, DE, evaluation, seeds
+    config/blast.yaml           # Default weights, bands, optimizer
   config/
-    settings.yaml
-    splits.yaml
-    labels.yaml
-    ml.yaml
-  data/                     # Generated (gitignored) — delete with --fresh
+    settings.yaml               # Fetch, filters, indicators
+    labels.yaml                 # Reference swing profile
+    splits.yaml                 # Production split template
+  data/                         # Generated (see .gitignore)
+  docs/
+    ARCHITECTURE.md             # Module map and data flow
+    BLAST_SCORE_IMPLEMENTATION_PLAN.md
 ```
 
-## Live scanner (separate)
+For a per-module reference, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
+## Git and generated data
+
+`.gitignore` excludes bulk datasets (parquets, DuckDB, raw OHLCV/bhavcopy) and weight YAMLs. **Tracked** under `data/`:
+
+- `data/splits.yaml`, `data/sector_map.csv`
+- `data/blast/tune_*.log` and `data/blast/runs/**/tune_*.log`
+- `data/blast/runs/**/manifest.yaml`
+
+Rebuild datasets locally with `build_dataset.py`; re-tune or copy weights from run archives as needed.
+
+## Requirements
 
 ```powershell
-python Collector/start.py
-python Collector/start.py --refresh
+pip install -r requirements.txt
 ```
 
-Uses a lighter inline indicator set for **today's** breakouts. The dataset pipeline uses the full `indicators.py` module for research.
-
-## Cleaning generated data
-
-```powershell
-# Option 1: CLI flag on next run
-python build_dataset.py --fresh ...
-
-# Option 2: manual
-Remove-Item -Recurse -Force data
-```
-
-Everything under `data/` is gitignored. Only config and source are versioned.
+Core: `pandas`, `numpy`, `pyarrow`, `duckdb`, `yfinance`, `pyyaml`, `tqdm`, `scipy`, `ta`.
