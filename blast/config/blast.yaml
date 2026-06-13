@@ -1,0 +1,47 @@
+# Blueprint fallback only; production standard = data/blast/standard/ (run_01)
+weights_default:
+  trend: 22
+  breakout: 22
+  volume: 17
+  delivery: 17
+  momentum: 11
+  sector: 6
+  risk: 5
+
+weights_standard_dir: data/blast/standard
+
+alert_bands:
+  a_plus: 85
+  a: 75
+  b: 65
+
+thresholds:
+  volume_ratio_min: 2.0
+  rsi_min: 55
+  rsi_max: 75
+  delivery_pct_min: 50
+  atr_pct_max: 0.06
+  max_pullback_ema20: 0.025
+  sector_breadth_low: 0.40
+  sector_breadth_high: 0.70
+
+filters:
+  min_market_breadth: 0.40
+  use_macro_filter: true
+
+optimizer:
+  objective: precision_at_10
+  top_k: 10
+  min_pool_size: 10
+  min_weight_per_category: 3
+  de_popsize: 60
+  de_maxiter: 150
+  polish_maxiter: 50
+  n_restarts: 3
+  de_log_every: 10
+  sparse_penalty: 0.05
+  false_alert_penalty: 0.03
+  quick_de_popsize: 15
+  quick_de_maxiter: 25
+  quick_n_restarts: 1
+  quick_polish_maxiter: 30

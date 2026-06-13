@@ -1,0 +1,10 @@
+profiles:
+  reference_swing:
+    description: "Reference 3-day swing (+4% target, -2.5% stop)"
+    target_pct: 0.04
+    stop_pct: 0.025
+    forward_days: 3
+    per_segment: false
+
+output_columns:
+  reference_swing: outcome_reference

@@ -1,0 +1,37 @@
+run_id: run_02
+label: Full EA tune seeded from standard (run_01)
+created_at: "2026-06-12"
+tune_log: tune_20260612_195422.log
+mode: full
+seed_source: data/blast/standard/
+selected: seed_0
+note: DE did not beat standard on validation; all segments kept run_01 weights
+validation_p10:
+  large_cap: 0.2123
+  mid_cap: 0.3003
+  small_cap: 0.3325
+weights:
+  large_cap:
+    trend: 78
+    breakout: 3
+    volume: 7
+    delivery: 3
+    momentum: 3
+    sector: 3
+    risk: 3
+  mid_cap:
+    trend: 66
+    breakout: 3
+    volume: 3
+    delivery: 8
+    momentum: 3
+    sector: 14
+    risk: 3
+  small_cap:
+    trend: 77
+    breakout: 3
+    volume: 3
+    delivery: 3
+    momentum: 8
+    sector: 3
+    risk: 3

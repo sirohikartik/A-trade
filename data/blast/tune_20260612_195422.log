@@ -1,0 +1,248 @@
+19:54:22 INFO Log file: E:\Stock\A-trade\data\blast\tune_20260612_195422.log
+19:54:22 INFO Blast weight tuning  mode=full  segments=large_cap, mid_cap, small_cap
+19:54:22 INFO Results will be archived to data/blast/runs/run_02/
+19:54:22 INFO Segment 1/3: large_cap
+19:54:22 INFO ============================================================
+19:54:22 INFO Loading segment frame: large_cap
+19:54:22 INFO Loaded 113264 rows in 0.1s
+19:54:22 INFO Built fitness contexts in 0.2s
+19:54:22 INFO Starting large_cap  quick=False  popsize=60  maxiter=150  restarts=3  polish=50  train_days=359  val_days=326
+19:54:22 INFO Evaluating 8 seed vectors
+19:54:22 INFO seed_0  train_P@10=0.194  val_P@10=0.189  weights={'trend': 78, 'breakout': 3, 'volume': 7, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:54:22 INFO seed_1  train_P@10=0.135  val_P@10=0.132  weights={'trend': 21, 'breakout': 21, 'volume': 17, 'delivery': 17, 'momentum': 11, 'sector': 7, 'risk': 6}
+19:54:23 INFO seed_2  train_P@10=0.153  val_P@10=0.148  weights={'trend': 40, 'breakout': 7, 'volume': 8, 'delivery': 7, 'momentum': 11, 'sector': 19, 'risk': 8}
+19:54:23 INFO seed_3  train_P@10=0.113  val_P@10=0.121  weights={'trend': 14, 'breakout': 18, 'volume': 8, 'delivery': 15, 'momentum': 5, 'sector': 20, 'risk': 20}
+19:54:23 INFO seed_4  train_P@10=0.134  val_P@10=0.129  weights={'trend': 6, 'breakout': 27, 'volume': 16, 'delivery': 9, 'momentum': 18, 'sector': 7, 'risk': 17}
+19:54:23 INFO seed_5  train_P@10=0.112  val_P@10=0.113  weights={'trend': 5, 'breakout': 19, 'volume': 7, 'delivery': 24, 'momentum': 21, 'sector': 10, 'risk': 14}
+19:54:23 INFO seed_6  train_P@10=0.136  val_P@10=0.134  weights={'trend': 6, 'breakout': 12, 'volume': 28, 'delivery': 17, 'momentum': 17, 'sector': 8, 'risk': 12}
+19:54:23 INFO seed_7  train_P@10=0.148  val_P@10=0.149  weights={'trend': 21, 'breakout': 5, 'volume': 19, 'delivery': 11, 'momentum': 11, 'sector': 29, 'risk': 4}
+19:54:23 INFO DE restart 1/3 starting (rng_seed=89250)
+19:54:26 INFO DE restart 0  iter 1/150  conv=0.0067  train_P@10=0.194  weights={'trend': 78, 'breakout': 3, 'volume': 6, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:54:39 INFO DE restart 0  iter 10/150  conv=0.0633  train_P@10=0.194  weights={'trend': 78, 'breakout': 3, 'volume': 7, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:54:54 INFO DE restart 0  iter 20/150  conv=0.8248  train_P@10=0.194  weights={'trend': 78, 'breakout': 3, 'volume': 7, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:55:00 INFO DE restart 0 finished  nit=24  success=True  train_fitness=0.1941
+19:55:00 INFO DE restart 0 polishing (50 iter max)
+19:55:00 INFO de_0  train_P@10=0.194  val_P@10=0.189  weights={'trend': 78, 'breakout': 3, 'volume': 7, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:55:00 INFO DE restart 2/3 starting (rng_seed=773956)
+19:55:03 INFO DE restart 1  iter 1/150  conv=0.0065  train_P@10=0.194  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:55:16 INFO DE restart 1  iter 10/150  conv=0.1402  train_P@10=0.194  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:55:29 INFO DE restart 1  iter 20/150  conv=0.9014  train_P@10=0.194  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:55:31 INFO DE restart 1 finished  nit=21  success=True  train_fitness=0.1941
+19:55:31 INFO DE restart 1 polishing (50 iter max)
+19:55:31 INFO de_1  train_P@10=0.194  val_P@10=0.189  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:55:31 INFO DE restart 3/3 starting (rng_seed=654571)
+19:55:34 INFO DE restart 2  iter 1/150  conv=0.0070  train_P@10=0.193  weights={'trend': 81, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:55:46 INFO DE restart 2  iter 10/150  conv=0.0915  train_P@10=0.194  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:56:00 INFO DE restart 2  iter 20/150  conv=0.4325  train_P@10=0.194  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:56:11 INFO DE restart 2 finished  nit=28  success=True  train_fitness=0.1941
+19:56:11 INFO DE restart 2 polishing (50 iter max)
+19:56:11 INFO de_2  train_P@10=0.194  val_P@10=0.189  weights={'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:56:11 INFO Candidate leaderboard (val P@10):
+19:56:11 INFO   seed_0    val=0.212  train=0.217  {'trend': 78, 'breakout': 3, 'volume': 7, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:56:11 INFO   de_0      val=0.212  train=0.217  {'trend': 78, 'breakout': 3, 'volume': 7, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:56:11 INFO   de_1      val=0.212  train=0.217  {'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:56:11 INFO   de_2      val=0.212  train=0.217  {'trend': 80, 'breakout': 3, 'volume': 4, 'delivery': 3, 'momentum': 3, 'sector': 3, 'risk': 4}
+19:56:11 INFO   seed_7    val=0.174  train=0.172  {'trend': 21, 'breakout': 5, 'volume': 19, 'delivery': 11, 'momentum': 11, 'sector': 29, 'risk': 4}
+19:56:11 INFO   seed_2    val=0.173  train=0.178  {'trend': 40, 'breakout': 7, 'volume': 8, 'delivery': 7, 'momentum': 11, 'sector': 19, 'risk': 8}
+19:56:11 INFO   seed_6    val=0.160  train=0.162  {'trend': 6, 'breakout': 12, 'volume': 28, 'delivery': 17, 'momentum': 17, 'sector': 8, 'risk': 12}
+19:56:11 INFO   seed_1    val=0.158  train=0.160  {'trend': 21, 'breakout': 21, 'volume': 17, 'delivery': 17, 'momentum': 11, 'sector': 7, 'risk': 6}
+19:56:11 INFO   seed_4    val=0.154  train=0.160  {'trend': 6, 'breakout': 27, 'volume': 16, 'delivery': 9, 'momentum': 18, 'sector': 7, 'risk': 17}
+19:56:11 INFO   seed_3    val=0.147  train=0.138  {'trend': 14, 'breakout': 18, 'volume': 8, 'delivery': 15, 'momentum': 5, 'sector': 20, 'risk': 20}
+19:56:11 INFO   seed_5    val=0.139  train=0.138  {'trend': 5, 'breakout': 19, 'volume': 7, 'delivery': 24, 'momentum': 21, 'sector': 10, 'risk': 14}
+19:56:11 INFO Selected winner: seed_0  val_P@10=0.212
+19:56:11 INFO Tuning finished in 108.5s
+19:56:11 INFO Selected: seed_0
+19:56:11 INFO 
+Weights: trend=78, breakout=3, volume=7, delivery=3, momentum=3, sector=3, risk=3
+
+[train]
+  base_rate=16.3%
+  P@5=24.7%  lift=+8.4%  CI=[22.8%, 26.8%]
+  P@10=21.8%  lift=+5.5%  CI=[20.4%, 23.1%]
+  P@20=18.4%  lift=+2.1%  CI=[17.5%, 19.3%]
+  days=359  median_pool=86.0
+
+[validation]
+  base_rate=16.1%
+  P@5=24.0%  lift=+7.9%  CI=[22.0%, 26.1%]
+  P@10=21.2%  lift=+5.2%  CI=[19.9%, 22.7%]
+  P@20=19.1%  lift=+3.0%  CI=[18.2%, 20.1%]
+  days=326  median_pool=94.0
+
+[test]
+  base_rate=12.8%
+  P@5=15.1%  lift=+2.2%  CI=[13.1%, 17.3%]
+  P@10=13.9%  lift=+1.1%  CI=[12.6%, 15.4%]
+  P@20=12.5%  lift=-0.4%  CI=[11.6%, 13.5%]
+  days=227  median_pool=97.0
+19:56:11 INFO Saved E:\Stock\A-trade\data\blast\weights_large_cap.yaml
+19:56:11 INFO Segment 2/3: mid_cap
+19:56:11 INFO ============================================================
+19:56:11 INFO Loading segment frame: mid_cap
+19:56:11 INFO Loaded 156757 rows in 0.1s
+19:56:11 INFO Built fitness contexts in 0.3s
+19:56:11 INFO Starting mid_cap  quick=False  popsize=60  maxiter=150  restarts=3  polish=50  train_days=359  val_days=326
+19:56:11 INFO Evaluating 8 seed vectors
+19:56:11 INFO seed_0  train_P@10=0.253  val_P@10=0.279  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:56:11 INFO seed_1  train_P@10=0.211  val_P@10=0.234  weights={'trend': 21, 'breakout': 21, 'volume': 17, 'delivery': 17, 'momentum': 11, 'sector': 7, 'risk': 6}
+19:56:11 INFO seed_2  train_P@10=0.232  val_P@10=0.277  weights={'trend': 51, 'breakout': 5, 'volume': 5, 'delivery': 5, 'momentum': 19, 'sector': 10, 'risk': 5}
+19:56:11 INFO seed_3  train_P@10=0.187  val_P@10=0.223  weights={'trend': 15, 'breakout': 17, 'volume': 8, 'delivery': 28, 'momentum': 8, 'sector': 11, 'risk': 13}
+19:56:11 INFO seed_4  train_P@10=0.224  val_P@10=0.240  weights={'trend': 12, 'breakout': 7, 'volume': 23, 'delivery': 16, 'momentum': 5, 'sector': 29, 'risk': 8}
+19:56:11 INFO seed_5  train_P@10=0.224  val_P@10=0.258  weights={'trend': 24, 'breakout': 4, 'volume': 25, 'delivery': 8, 'momentum': 9, 'sector': 6, 'risk': 24}
+19:56:11 INFO seed_6  train_P@10=0.219  val_P@10=0.250  weights={'trend': 15, 'breakout': 7, 'volume': 24, 'delivery': 7, 'momentum': 19, 'sector': 23, 'risk': 5}
+19:56:11 INFO seed_7  train_P@10=0.198  val_P@10=0.221  weights={'trend': 7, 'breakout': 18, 'volume': 18, 'delivery': 25, 'momentum': 22, 'sector': 3, 'risk': 7}
+19:56:11 INFO DE restart 1/3 starting (rng_seed=89250)
+19:56:14 INFO DE restart 0  iter 1/150  conv=0.0112  train_P@10=0.252  weights={'trend': 68, 'breakout': 3, 'volume': 15, 'delivery': 3, 'momentum': 3, 'sector': 5, 'risk': 3}
+19:56:27 INFO DE restart 0  iter 10/150  conv=0.1012  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:56:41 INFO DE restart 0  iter 20/150  conv=0.1840  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:56:54 INFO DE restart 0  iter 30/150  conv=0.2400  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:57:08 INFO DE restart 0  iter 40/150  conv=0.3138  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:57:22 INFO DE restart 0  iter 50/150  conv=0.3882  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:57:35 INFO DE restart 0  iter 60/150  conv=0.6436  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:57:42 INFO DE restart 0 finished  nit=65  success=True  train_fitness=0.2535
+19:57:42 INFO DE restart 0 polishing (50 iter max)
+19:57:43 INFO de_0  train_P@10=0.253  val_P@10=0.279  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:57:43 INFO DE restart 2/3 starting (rng_seed=773956)
+19:57:45 INFO DE restart 1  iter 1/150  conv=0.0101  train_P@10=0.252  weights={'trend': 76, 'breakout': 3, 'volume': 3, 'delivery': 9, 'momentum': 3, 'sector': 3, 'risk': 3}
+19:57:58 INFO DE restart 1  iter 10/150  conv=0.0665  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:58:11 INFO DE restart 1  iter 20/150  conv=0.1912  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:58:25 INFO DE restart 1  iter 30/150  conv=0.2512  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:58:38 INFO DE restart 1  iter 40/150  conv=0.2942  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:58:52 INFO DE restart 1  iter 50/150  conv=0.3328  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:59:06 INFO DE restart 1  iter 60/150  conv=0.3635  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:59:20 INFO DE restart 1  iter 70/150  conv=0.3977  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:59:34 INFO DE restart 1  iter 80/150  conv=0.5300  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+19:59:48 INFO DE restart 1  iter 90/150  conv=0.7329  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:00:00 INFO DE restart 1 finished  nit=99  success=True  train_fitness=0.2535
+20:00:00 INFO DE restart 1 polishing (50 iter max)
+20:00:01 INFO de_1  train_P@10=0.253  val_P@10=0.279  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:00:01 INFO DE restart 3/3 starting (rng_seed=654571)
+20:00:04 INFO DE restart 2  iter 1/150  conv=0.0113  train_P@10=0.250  weights={'trend': 62, 'breakout': 3, 'volume': 21, 'delivery': 3, 'momentum': 3, 'sector': 4, 'risk': 4}
+20:00:16 INFO DE restart 2  iter 10/150  conv=0.0821  train_P@10=0.253  weights={'trend': 74, 'breakout': 3, 'volume': 4, 'delivery': 9, 'momentum': 3, 'sector': 4, 'risk': 3}
+20:00:30 INFO DE restart 2  iter 20/150  conv=0.1878  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:00:43 INFO DE restart 2  iter 30/150  conv=0.2637  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:00:57 INFO DE restart 2  iter 40/150  conv=0.3195  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:01:11 INFO DE restart 2  iter 50/150  conv=0.3282  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:01:24 INFO DE restart 2  iter 60/150  conv=0.3487  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:01:38 INFO DE restart 2  iter 70/150  conv=0.4195  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:01:53 INFO DE restart 2  iter 80/150  conv=0.6332  train_P@10=0.253  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:01:59 INFO DE restart 2 finished  nit=85  success=True  train_fitness=0.2535
+20:01:59 INFO DE restart 2 polishing (50 iter max)
+20:02:00 INFO de_2  train_P@10=0.253  val_P@10=0.279  weights={'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:02:00 INFO Candidate leaderboard (val P@10):
+20:02:00 INFO   seed_0    val=0.300  train=0.275  {'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:02:00 INFO   de_0      val=0.300  train=0.275  {'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:02:00 INFO   de_1      val=0.300  train=0.275  {'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:02:00 INFO   de_2      val=0.300  train=0.275  {'trend': 66, 'breakout': 3, 'volume': 3, 'delivery': 8, 'momentum': 3, 'sector': 14, 'risk': 3}
+20:02:00 INFO   seed_2    val=0.298  train=0.254  {'trend': 51, 'breakout': 5, 'volume': 5, 'delivery': 5, 'momentum': 19, 'sector': 10, 'risk': 5}
+20:02:00 INFO   seed_5    val=0.280  train=0.247  {'trend': 24, 'breakout': 4, 'volume': 25, 'delivery': 8, 'momentum': 9, 'sector': 6, 'risk': 24}
+20:02:00 INFO   seed_6    val=0.272  train=0.241  {'trend': 15, 'breakout': 7, 'volume': 24, 'delivery': 7, 'momentum': 19, 'sector': 23, 'risk': 5}
+20:02:00 INFO   seed_4    val=0.263  train=0.246  {'trend': 12, 'breakout': 7, 'volume': 23, 'delivery': 16, 'momentum': 5, 'sector': 29, 'risk': 8}
+20:02:00 INFO   seed_1    val=0.257  train=0.234  {'trend': 21, 'breakout': 21, 'volume': 17, 'delivery': 17, 'momentum': 11, 'sector': 7, 'risk': 6}
+20:02:00 INFO   seed_3    val=0.246  train=0.211  {'trend': 15, 'breakout': 17, 'volume': 8, 'delivery': 28, 'momentum': 8, 'sector': 11, 'risk': 13}
+20:02:00 INFO   seed_7    val=0.244  train=0.221  {'trend': 7, 'breakout': 18, 'volume': 18, 'delivery': 25, 'momentum': 22, 'sector': 3, 'risk': 7}
+20:02:00 INFO Selected winner: seed_0  val_P@10=0.300
+20:02:00 INFO Tuning finished in 348.3s
+20:02:00 INFO Selected: seed_0
+20:02:00 INFO 
+Weights: trend=66, breakout=3, volume=3, delivery=8, momentum=3, sector=14, risk=3
+
+[train]
+  base_rate=21.0%
+  P@5=28.2%  lift=+7.3%  CI=[26.2%, 30.4%]
+  P@10=27.5%  lift=+6.5%  CI=[26.1%, 29.0%]
+  P@20=25.1%  lift=+4.1%  CI=[24.1%, 26.1%]
+  days=359  median_pool=112.0
+
+[validation]
+  base_rate=23.2%
+  P@5=31.1%  lift=+7.9%  CI=[28.9%, 33.4%]
+  P@10=30.0%  lift=+6.8%  CI=[28.5%, 31.6%]
+  P@20=29.5%  lift=+6.3%  CI=[28.4%, 30.6%]
+  days=326  median_pool=133.0
+
+[test]
+  base_rate=18.4%
+  P@5=21.1%  lift=+2.7%  CI=[18.8%, 23.5%]
+  P@10=21.0%  lift=+2.6%  CI=[19.3%, 22.7%]
+  P@20=20.2%  lift=+1.8%  CI=[19.0%, 21.3%]
+  days=227  median_pool=142.0
+20:02:00 INFO Saved E:\Stock\A-trade\data\blast\weights_mid_cap.yaml
+20:02:00 INFO Segment 3/3: small_cap
+20:02:00 INFO ============================================================
+20:02:00 INFO Loading segment frame: small_cap
+20:02:00 INFO Loaded 264573 rows in 0.2s
+20:02:00 INFO Built fitness contexts in 0.5s
+20:02:00 INFO Starting small_cap  quick=False  popsize=60  maxiter=150  restarts=3  polish=50  train_days=359  val_days=326
+20:02:00 INFO Evaluating 8 seed vectors
+20:02:00 INFO seed_0  train_P@10=0.321  val_P@10=0.312  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:02:00 INFO seed_1  train_P@10=0.276  val_P@10=0.286  weights={'trend': 21, 'breakout': 21, 'volume': 17, 'delivery': 17, 'momentum': 11, 'sector': 7, 'risk': 6}
+20:02:00 INFO seed_2  train_P@10=0.290  val_P@10=0.294  weights={'trend': 50, 'breakout': 5, 'volume': 6, 'delivery': 5, 'momentum': 24, 'sector': 5, 'risk': 5}
+20:02:00 INFO seed_3  train_P@10=0.229  val_P@10=0.250  weights={'trend': 15, 'breakout': 8, 'volume': 10, 'delivery': 21, 'momentum': 7, 'sector': 9, 'risk': 30}
+20:02:00 INFO seed_4  train_P@10=0.202  val_P@10=0.221  weights={'trend': 5, 'breakout': 5, 'volume': 4, 'delivery': 6, 'momentum': 13, 'sector': 10, 'risk': 57}
+20:02:00 INFO seed_5  train_P@10=0.230  val_P@10=0.268  weights={'trend': 7, 'breakout': 15, 'volume': 21, 'delivery': 30, 'momentum': 10, 'sector': 6, 'risk': 11}
+20:02:00 INFO seed_6  train_P@10=0.221  val_P@10=0.252  weights={'trend': 4, 'breakout': 5, 'volume': 19, 'delivery': 35, 'momentum': 12, 'sector': 19, 'risk': 6}
+20:02:00 INFO seed_7  train_P@10=0.272  val_P@10=0.284  weights={'trend': 23, 'breakout': 5, 'volume': 34, 'delivery': 11, 'momentum': 11, 'sector': 7, 'risk': 9}
+20:02:00 INFO DE restart 1/3 starting (rng_seed=89250)
+20:02:04 INFO DE restart 0  iter 1/150  conv=0.0117  train_P@10=0.317  weights={'trend': 76, 'breakout': 3, 'volume': 5, 'delivery': 3, 'momentum': 7, 'sector': 3, 'risk': 3}
+20:02:18 INFO DE restart 0  iter 10/150  conv=0.0568  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:02:34 INFO DE restart 0  iter 20/150  conv=0.2455  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:02:47 INFO DE restart 0 finished  nit=28  success=True  train_fitness=0.3215
+20:02:47 INFO DE restart 0 polishing (50 iter max)
+20:02:48 INFO de_0  train_P@10=0.321  val_P@10=0.312  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:02:48 INFO DE restart 2/3 starting (rng_seed=773956)
+20:02:51 INFO DE restart 1  iter 1/150  conv=0.0113  train_P@10=0.319  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 7, 'sector': 3, 'risk': 4}
+20:03:05 INFO DE restart 1  iter 10/150  conv=0.0821  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:03:22 INFO DE restart 1  iter 20/150  conv=0.3822  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:03:31 INFO DE restart 1 finished  nit=25  success=True  train_fitness=0.3215
+20:03:31 INFO DE restart 1 polishing (50 iter max)
+20:03:31 INFO de_1  train_P@10=0.321  val_P@10=0.312  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:03:31 INFO DE restart 3/3 starting (rng_seed=654571)
+20:03:35 INFO DE restart 2  iter 1/150  conv=0.0117  train_P@10=0.318  weights={'trend': 79, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 6, 'sector': 3, 'risk': 3}
+20:03:51 INFO DE restart 2  iter 10/150  conv=0.0725  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:08 INFO DE restart 2  iter 20/150  conv=0.2297  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:23 INFO DE restart 2  iter 30/150  conv=0.9211  train_P@10=0.321  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:27 INFO DE restart 2 finished  nit=33  success=True  train_fitness=0.3215
+20:04:27 INFO DE restart 2 polishing (50 iter max)
+20:04:28 INFO de_2  train_P@10=0.321  val_P@10=0.312  weights={'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:28 INFO Candidate leaderboard (val P@10):
+20:04:28 INFO   seed_0    val=0.333  train=0.341  {'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:28 INFO   de_0      val=0.333  train=0.341  {'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:28 INFO   de_1      val=0.333  train=0.341  {'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:28 INFO   de_2      val=0.333  train=0.341  {'trend': 77, 'breakout': 3, 'volume': 3, 'delivery': 3, 'momentum': 8, 'sector': 3, 'risk': 3}
+20:04:28 INFO   seed_2    val=0.314  train=0.311  {'trend': 50, 'breakout': 5, 'volume': 6, 'delivery': 5, 'momentum': 24, 'sector': 5, 'risk': 5}
+20:04:28 INFO   seed_1    val=0.306  train=0.297  {'trend': 21, 'breakout': 21, 'volume': 17, 'delivery': 17, 'momentum': 11, 'sector': 7, 'risk': 6}
+20:04:28 INFO   seed_7    val=0.305  train=0.293  {'trend': 23, 'breakout': 5, 'volume': 34, 'delivery': 11, 'momentum': 11, 'sector': 7, 'risk': 9}
+20:04:28 INFO   seed_5    val=0.289  train=0.252  {'trend': 7, 'breakout': 15, 'volume': 21, 'delivery': 30, 'momentum': 10, 'sector': 6, 'risk': 11}
+20:04:28 INFO   seed_6    val=0.274  train=0.244  {'trend': 4, 'breakout': 5, 'volume': 19, 'delivery': 35, 'momentum': 12, 'sector': 19, 'risk': 6}
+20:04:28 INFO   seed_3    val=0.272  train=0.252  {'trend': 15, 'breakout': 8, 'volume': 10, 'delivery': 21, 'momentum': 7, 'sector': 9, 'risk': 30}
+20:04:28 INFO   seed_4    val=0.244  train=0.225  {'trend': 5, 'breakout': 5, 'volume': 4, 'delivery': 6, 'momentum': 13, 'sector': 10, 'risk': 57}
+20:04:28 INFO Selected winner: seed_0  val_P@10=0.333
+20:04:28 INFO Tuning finished in 147.5s
+20:04:28 INFO Selected: seed_0
+20:04:28 INFO 
+Weights: trend=77, breakout=3, volume=3, delivery=3, momentum=8, sector=3, risk=3
+
+[train]
+  base_rate=25.2%
+  P@5=32.8%  lift=+7.5%  CI=[30.6%, 35.0%]
+  P@10=34.1%  lift=+8.9%  CI=[32.6%, 35.7%]
+  P@20=31.8%  lift=+6.6%  CI=[30.7%, 32.9%]
+  days=359  median_pool=190.0
+
+[validation]
+  base_rate=27.2%
+  P@5=35.1%  lift=+7.9%  CI=[32.8%, 37.4%]
+  P@10=33.2%  lift=+6.1%  CI=[31.6%, 34.9%]
+  P@20=32.7%  lift=+5.5%  CI=[31.6%, 33.8%]
+  days=326  median_pool=216.0
+
+[test]
+  base_rate=24.0%
+  P@5=32.3%  lift=+8.3%  CI=[29.7%, 35.1%]
+  P@10=30.9%  lift=+6.9%  CI=[29.1%, 32.9%]
+  P@20=28.8%  lift=+4.7%  CI=[27.5%, 30.1%]
+  days=227  median_pool=236.0
+20:04:28 INFO Saved E:\Stock\A-trade\data\blast\weights_small_cap.yaml
+20:04:28 INFO Archived run to E:\Stock\A-trade\data\blast\runs\run_02
+20:04:28 INFO Done in 10.1 min  log=E:\Stock\A-trade\data\blast\tune_20260612_195422.log

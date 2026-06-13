@@ -1,0 +1,60 @@
+data:
+  from_date: null          # computed from years_of_history if null
+  years_of_history: 5
+  calendar_buffer_days: 45
+  # Short test fetch: set fetch_recent_days (e.g. 30) or pass --days on CLI
+  fetch_recent_days: null
+  train_end: "2023-06-30"       # legacy; see config/splits.yaml for full ranges
+  validation_start: "2023-07-01"
+
+filters:
+  min_price: 20
+  min_history_days: 250
+  dev_min_history_days: 5       # used when --days / fetch_recent_days is set
+  min_volume: 100000
+  min_avg_daily_value:
+    large_cap: 500000000
+    mid_cap: 100000000
+  macro:
+    min_market_breadth: 0.40
+
+indicators:
+  ema_periods: [20, 50, 200]
+  rsi_period: 14
+  adx_period: 14
+  atr_period: 14
+  bb_period: 20
+  bb_std: 2
+  volume_ma_period: 20
+  high_52w_period: 252
+  adx_rising_lookback: 3
+
+reference_rules:
+  rsi_min: 55
+  rsi_max: 75
+  adx_min: 20
+  volume_ratio_min: 2.0
+  volume_ratio_strong: 3.0
+  delivery_pct_min: 50
+  atr_pct_max: 0.06
+  near_20d_high_pct: 0.98
+  near_52w_high_pct: 0.97
+
+# Top-N universe selection (train-period ranking, no val leakage)
+universe:
+  min_setup_signals: 8
+  ranking_weights:
+    setup_win_rate: 0.30
+    breakout_win_rate: 0.20
+    momentum_win_rate: 0.15
+    delivery_win_rate: 0.10
+    trend_consistency: 0.10
+    volume_edge: 0.05
+    liquidity: 0.05
+    avg_return: 0.05
+
+fetch:
+  workers: 5
+  sleep_min: 0.2
+  sleep_max: 0.5
+  delivery_workers: 8

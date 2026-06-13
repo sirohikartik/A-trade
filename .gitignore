@@ -1,11 +1,32 @@
-# Generated at runtime (DuckDB + any local artifacts)
-data/
-targets/
-data/history/
-*.duckdb
-*.duckdb.wal
+# Python
 __pycache__/
 *.pyc
 .venv/
 venv/
 .env
+
+# Local database
+*.duckdb
+*.duckdb.wal
+data/atrade.duckdb
+
+# Bulk datasets (rebuild via build_dataset.py)
+data/raw/ohlcv/
+data/raw/bhavcopy/
+data/processed/
+targets/
+data/history/
+
+# Small generated metadata — tracked (splits, sector_map, failed dates csv)
+
+# Blast: active tuned weights (regenerated)
+data/blast/weights_*.yaml
+data/blast/standard/
+
+# Blast: archived run weights (keep manifests + logs only)
+data/blast/runs/**/weights_*.yaml
+
+# Blast: tune logs + run manifests ARE tracked
+#   data/blast/tune_*.log
+#   data/blast/runs/**/manifest.yaml
+#   data/blast/runs/**/tune_*.log

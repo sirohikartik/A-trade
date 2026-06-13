@@ -1,0 +1,15 @@
+description: Resolved train / validation / test date ranges for research and blast
+  EA
+mode: config
+data_first: '2021-04-29'
+data_last: '2026-06-05'
+train:
+  start: '2021-04-29'
+  end: '2023-06-30'
+validation:
+  start: '2023-07-01'
+  end: '2024-12-31'
+test:
+  start: '2025-01-01'
+  end: '2026-06-05'
+  enabled: true

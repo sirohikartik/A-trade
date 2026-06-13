@@ -17,11 +17,13 @@ def db_path(base_dir: str) -> str:
 
 
 def connect(path: str, read_only: bool = False) -> duckdb.DuckDBPyConnection:
+    """Open (or create) the DuckDB file at ``path``."""
     os.makedirs(os.path.dirname(path), exist_ok=True)
     return duckdb.connect(path, read_only=read_only)
 
 
 def init_schema(conn: duckdb.DuckDBPyConnection) -> None:
+    """Create OHLCV, symbol_meta, and scan result tables if missing."""
     conn.execute(
         """
         CREATE TABLE IF NOT EXISTS ohlcv_daily (
@@ -119,6 +121,20 @@ def save_ohlcv(path: str, symbol: str, df: pd.DataFrame) -> None:
                 """,
                 [symbol, len(rows), first_date, last_date, now],
             )
+        finally:
+            conn.close()
+
+
+def list_symbols(path: str) -> list[str]:
+    if not os.path.isfile(path):
+        return []
+    with _lock:
+        conn = connect(path, read_only=True)
+        try:
+            rows = conn.execute(
+                "SELECT DISTINCT symbol FROM ohlcv_daily ORDER BY symbol"
+            ).fetchall()
+            return [r[0] for r in rows]
         finally:
             conn.close()
 

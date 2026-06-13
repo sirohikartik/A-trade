@@ -1,50 +1,118 @@
-"""
-Scanner settings — edit values here before running Collector/start.py
+"""Paths and runtime settings for the scanner and dataset pipeline.
+
+Defaults load from ``config/settings.yaml``. ``build_dataset.py`` may call
+``set_runtime()`` for dev flags (``--days``, ``--max-symbols``).
 """
 
 import os
 
+import yaml
+
 # Project root (A-trade/)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(BASE_DIR, "config")
+SETTINGS_PATH = os.path.join(CONFIG_DIR, "settings.yaml")
+
+
+def _load_yaml() -> dict:
+    if os.path.isfile(SETTINGS_PATH):
+        with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
+            return yaml.safe_load(f) or {}
+    return {}
+
+
+_YAML = _load_yaml()
+_DATA = _YAML.get("data", {})
+_FETCH = _YAML.get("fetch", {})
+_FILTERS = _YAML.get("filters", {})
+
+# Runtime overrides (set by build_dataset.py --days / --max-symbols)
+_RUNTIME: dict = {}
+
+
+def set_runtime(**kwargs) -> None:
+    """Override fetch window and symbol limits for a single CLI run."""
+    _RUNTIME.update({k: v for k, v in kwargs.items() if v is not None})
+
+
+def clear_runtime() -> None:
+    _RUNTIME.clear()
+
 
 # =============================================================================
 # DATA FETCH (Yahoo Finance daily bars)
 # =============================================================================
 
-# How many years of history to download per symbol.
-YEARS_OF_HISTORY = 3
-
-# Extra calendar days on top of YEARS_OF_HISTORY (weekends, holidays, gaps).
-CALENDAR_BUFFER_DAYS = 45
-
-# Total calendar span requested from Yahoo: ~3 years + buffer → ~1140 days.
-LOOKBACK_DAYS = YEARS_OF_HISTORY * 365 + CALENDAR_BUFFER_DAYS
-
-# Minimum number of daily bars required to keep a symbol (EMA200 needs ~200).
-MIN_BARS = 220
-
-# Re-download from Yahoo even if symbol already exists in DuckDB.
+YEARS_OF_HISTORY = int(_DATA.get("years_of_history", 5))
+CALENDAR_BUFFER_DAYS = int(_DATA.get("calendar_buffer_days", 45))
+_FETCH_RECENT_DAYS = _DATA.get("fetch_recent_days")
+MIN_BARS_DEFAULT = int(_FILTERS.get("min_history_days", 250))
+DEV_MIN_BARS = int(_FILTERS.get("dev_min_history_days", 5))
 FORCE_REFRESH_ON_RUN = False
+
+TRAIN_END = _DATA.get("train_end", "2023-06-30")
+VALIDATION_START = _DATA.get("validation_start", "2023-07-01")
+SPLITS_CONFIG_PATH = os.path.join(CONFIG_DIR, "splits.yaml")
+
+
+def fetch_recent_days() -> int | None:
+    if _RUNTIME.get("fetch_days") is not None:
+        return int(_RUNTIME["fetch_days"])
+    if _FETCH_RECENT_DAYS is not None:
+        return int(_FETCH_RECENT_DAYS)
+    return None
+
+
+def lookback_days() -> int:
+    recent = fetch_recent_days()
+    if recent is not None:
+        return int(recent) + CALENDAR_BUFFER_DAYS
+    return YEARS_OF_HISTORY * 365 + CALENDAR_BUFFER_DAYS
+
+
+def min_bars_required() -> int:
+    if fetch_recent_days() is not None:
+        return DEV_MIN_BARS
+    return MIN_BARS_DEFAULT
+
+
+# Back-compat module-level names (default production values)
+LOOKBACK_DAYS = lookback_days()
+MIN_BARS = min_bars_required()
 
 # =============================================================================
 # DOWNLOAD CONCURRENCY
 # =============================================================================
 
-WORKERS = 5
-SLEEP_MIN = 0.2
-SLEEP_MAX = 0.5
+WORKERS = int(_FETCH.get("workers", 5))
+SLEEP_MIN = float(_FETCH.get("sleep_min", 0.2))
+SLEEP_MAX = float(_FETCH.get("sleep_max", 0.5))
+DELIVERY_WORKERS = int(_FETCH.get("delivery_workers", 8))
 
 # =============================================================================
 # SCAN FILTERS (breakout / momentum)
 # =============================================================================
 
-MIN_PRICE = 20
-MIN_VOLUME = 100_000
-MAX_ATR_PCT = 0.06
+MIN_PRICE = float(_FILTERS.get("min_price", 20))
+MIN_VOLUME = int(_FILTERS.get("min_volume", 100_000))
+MAX_ATR_PCT = float(_YAML.get("reference_rules", {}).get("atr_pct_max", 0.06))
 MIN_SCORE = 65
 
 # =============================================================================
-# PATHS (usually leave as-is)
+# PATHS
 # =============================================================================
 
-DB_PATH = os.path.join(BASE_DIR, "data", "atrade.duckdb")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+DB_PATH = os.path.join(DATA_DIR, "atrade.duckdb")
+RAW_OHLCV_DIR = os.path.join(DATA_DIR, "raw", "ohlcv")
+RAW_BHAVCOPY_DIR = os.path.join(DATA_DIR, "raw", "bhavcopy")
+PROCESSED_DIR = os.path.join(DATA_DIR, "processed")
+COMBINED_DIR = os.path.join(PROCESSED_DIR, "combined")
+SEGMENTS_DIR = os.path.join(PROCESSED_DIR, "segments")
+SEGMENT_MAP_PATH = os.path.join(PROCESSED_DIR, "segment_map.parquet")
+UNIVERSE_RANKINGS_PATH = os.path.join(PROCESSED_DIR, "universe_rankings.parquet")
+UNIVERSE_TOP_N_PATH = os.path.join(PROCESSED_DIR, "universe_top_n.json")
+MARKET_BREADTH_PATH = os.path.join(PROCESSED_DIR, "market_breadth.parquet")
+SPLITS_PATH = os.path.join(DATA_DIR, "splits.yaml")
+
+LABELS_PATH = os.path.join(CONFIG_DIR, "labels.yaml")
